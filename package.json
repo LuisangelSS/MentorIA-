@@ -1,0 +1,22 @@
+{
+  "name": "mentorIA-backend",
+  "version": "1.0.0",
+  "description": "Backend de MentorIA con Node.js y Express",
+  "main": "src/backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "dev": "nodemon src/backend/server.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.21.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

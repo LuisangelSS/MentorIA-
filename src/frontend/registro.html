@@ -19,45 +19,157 @@
                 <span class="font-bold text-[#8E94E5]">mejor estudiante.</span>
             </h1>
         </header>
+        
         <!-- Registro + Imagen -->
         <div class="flex xl:mt-10 2xl:mt-20 w-[80vw] justify-center gap-10">
             <div>
                 <a href="index.html">
                     <img class="2xl:size-130 size-100 ml-30" src="assets/svg/MentorIA-logo.svg" alt="" />
                 </a>
-                
             </div>
+            
             <div>
                 <div class="2xl:mt-10 w-100 2xl:h-[27rem] h-[25rem] bg-[#464973] border-1 rounded-2xl p-6">
                     <h2 class="2xl:mb-5 font-black text-4xl text-white">Registrarse</h2>
                     <br />
-                    <form action="" method="post" class="flex flex-col">
-                        <label class="font-bold" for="">
+                    
+                    <!-- Mensaje de estado -->
+                    <div id="message" class="hidden mb-4 p-3 rounded-lg text-center font-bold"></div>
+                    
+                    <form id="registerForm" class="flex flex-col">
+                        <label class="font-bold" for="username">
                             Nombre de usuario
                             <br />
-                            <input type="text" name="" id="" placeholder="ejemplo@gmail.com" class="p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" />
+                            <input 
+                                type="text" 
+                                name="username" 
+                                id="username" 
+                                placeholder="Tu nombre de usuario" 
+                                class="p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" 
+                                required 
+                            />
                         </label>
                         
-                        <label class="font-bold mt-2" for="">
-                            Contraseña
-                            
-                            <input type="password" name="" id="" placeholder="****************" class="p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" />
+                        <label class="font-bold mt-2" for="email">
+                            Email
+                            <br />
+                            <input 
+                                type="email" 
+                                name="email" 
+                                id="email" 
+                                placeholder="ejemplo@gmail.com" 
+                                class="p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" 
+                                required 
+                            />
                         </label>
+                        
+                        <label class="font-bold mt-2" for="password">
+                            Contraseña
+                            <br />
+                            <input 
+                                type="password" 
+                                name="password" 
+                                id="password" 
+                                placeholder="****************" 
+                                class="p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" 
+                                required 
+                                minlength="6"
+                            />
+                        </label>
+                        
                         <div class="mt-2 mb-2 font-bold m-auto">
-                            <input type="checkbox" name="" id="" class="" />
-                            Aceptar terminos y condiciones.
+                            <input type="checkbox" name="terms" id="terms" class="" required />
+                            <label for="terms">Aceptar términos y condiciones.</label>
                         </div>
 
-                        <input type="button" value="Crear cuenta" class="hover:cursor-pointer hover:bg-gray-300 2xl:mt-5 p-3 bg-white text-[#0C0C1C] font-black text-xl rounded-xl" />
+                        <button 
+                            type="submit" 
+                            id="submitBtn"
+                            class="hover:cursor-pointer hover:bg-gray-300 2xl:mt-5 p-3 bg-white text-[#0C0C1C] font-black text-xl rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Crear cuenta
+                        </button>
                     </form>
+                    
                     <div class="flex justify-center mt-2">
                         <a class="text-white" href="login.html">
                             ¿Ya tienes una sesión?
-                            <span class="font-bold">Clica aqui</span>
+                            <span class="font-bold">Clica aquí</span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            if (!userData.username || !userData.email || !userData.password) {
+                showMessage('Por favor, completa todos los campos', 'error');
+                return;
+            }
+            
+            if (userData.password.length < 6) {
+                showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creando cuenta...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('¡Cuenta creada exitosamente! Redirigiendo...', 'success');
+                    e.target.reset();
+
+                    setTimeout(() => {
+                        // Redirige a app.html
+                        window.location.href = './app.html';
+                        // Alternativa más segura:
+                        // window.location.replace('./app.html');
+                    }, 2000);
+
+                } else {
+                    showMessage(result.error || 'Error al crear la cuenta', 'error');
+                }
+                
+            } catch (error) {
+                console.error(error);
+                showMessage('Error de conexión. Verifica que el servidor esté funcionando.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Crear cuenta';
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `mb-4 p-3 rounded-lg text-center font-bold ${
+                type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+            }`;
+            messageDiv.classList.remove('hidden');
+
+            setTimeout(() => messageDiv.classList.add('hidden'), 5000);
+        }
+        </script>
+
     </body>
 </html>

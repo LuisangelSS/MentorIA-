@@ -4,7 +4,7 @@ export default defineConfig({
   content: [
     "./src/**/*.{html,js}",
     "./frontend/**/*.{html,js}",
-    "./*.html",
+    "frontend/*.html",
     "./scripts/**/*.js"
   ],
   theme: {

@@ -3,6 +3,7 @@ const input = form.querySelector("input");
 const button = form.querySelector("button");
 const chatBox = document.getElementById("chat-box");
 const chatTitle = document.getElementById("chat-title");
+const chatLogo = document.getElementById("chat-logo");
 
 button.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -12,11 +13,12 @@ button.addEventListener("click", async (e) => {
   // Ocultar el título la primera vez que se envía un mensaje
   if (chatTitle) {
     chatTitle.style.display = "none";
+    chatLogo.style.display = "none";
   }
 
   // Mostrar prompt en el chat
   const userMsg = document.createElement("div");
-  userMsg.className = " text-end font-bold text-white  p-2 bg-[#2E3050] rounded-lg mb-2 px-4 sm:px-6";
+  userMsg.className = "animate-fadeIn w-[900px] ml-10 text-end font-bold text-white  p-5 bg-[#2E3050] rounded-lg mb-8 px-4 sm:px-6";
   userMsg.innerHTML = prompt;
   chatBox.appendChild(userMsg);
 
@@ -32,7 +34,7 @@ button.addEventListener("click", async (e) => {
     const data = await res.json();
 
     const botMsg = document.createElement("div");
-    botMsg.className = "text-start text-white mb-4 px-4 p-2 bg-[#0C0C1C] rounded-lg sm:px-6 ";
+    botMsg.className = "animate-fadeIn w-[900px] mr-10 text-start text-white mb-8 px-4 p-5 bg-[#0C0C1C] rounded-lg sm:px-6 ";
     botMsg.innerHTML = data.reply;
     chatBox.appendChild(botMsg);
 

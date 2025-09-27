@@ -60,7 +60,7 @@
     <main class="animate-fadeIn">
         
         <div class="bg-[#464973] rounded-lg h-14 sm:h-16 lg:h-[7vh] flex items-center px-3 sm:px-4 border border-[#A3B5CD] animate-slideInLeft"> 
-            <img src="imgs/logo.svg" alt="Logo de MentorIA" class="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 animate-pulse-gentle">
+            <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 animate-pulse-gentle">
             <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
         </div>  
         
@@ -118,12 +118,13 @@
                 
                 <div class="rounded-xl flex-1 py-6 sm:py-10 flex flex-col justify-center items-center animate-fadeIn overflow-auto">
                     <div class="mb-6 sm:mb-8">
-                        <div class="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-[#464973] rounded-full flex items-center justify-center">
-                            <i class='bx bx-brain text-6xl sm:text-8xl lg:text-9xl text-[#A3B5CD]'></i>
+                        <div id="chat-logo" class="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-[#464973] rounded-full flex items-center justify-center">
+                            <img class='size-40 bx bx-brain text-3xl sm:text-8xl lg:text-9xl text-[#A3B5CD]' src="assets/svg/logo.svg"></img>
                         </div>
                         
-                        <div id="chat-box" class="w-full max-w-2xl min-h-[120px] max-h-64 overflow-y-auto bg-[#161B32] rounded-xl p-4 mt-6 mb-2 custom-scrollbar"></div>
+                        
                     </div>
+            <div id="chat-box" class=" flex flex-col w-[1200px] overflow-y-auto bg-[#161B32] rounded-xl p-4 mt-6 mb-2 custom-scrollbar items-center"></div>
                     <h1 id="chat-title" class="font-bold text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-center px-4 leading-tight">
                         ¿Qué quieres estudiar hoy?
                     </h1>

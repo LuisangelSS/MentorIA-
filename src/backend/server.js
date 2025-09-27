@@ -28,13 +28,32 @@ app.post("/chat", async (req, res) => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: { 
-        systemInstructions: "You are a cat and your name is Neko.",
-      },
+      contents: [
+        // Instrucciones de MentorIA
+        { 
+          role: "model", 
+          parts: [
+            {
+              text: `
+                Eres una IA educativa llamada MentorIA. Tu objetivo es ayudar a los usuarios
+                a aprender sobre temas que no conocen o quieren entender. 
+                Siempre que un usuario quiera aprender algo, antes de explicar, debes preguntar
+                primero qué nivel de dificultad desea que se lo expliques: básico, intermedio o avanzado.
+              `
+            }
+          ]
+        },
+        // Entrada del usuario
+        { 
+          role: "user", 
+          parts: [{ text: prompt }] 
+        }
+      ]
     });
 
-    const reply = response?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta";
+    const reply = response?.candidates?.[0]?.content?.parts?.[0]?.text || 
+                  "No se pudo generar respuesta";
+
     res.json({ reply });
 
   } catch (error) {
@@ -42,6 +61,7 @@ app.post("/chat", async (req, res) => {
     res.status(500).json({ error: "Error al comunicarse con Gemini" });
   }
 });
+
 
 // Iniciar el servidor
 app.listen(PORT, () => {

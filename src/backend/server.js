@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import path from "path";
+import { marked } from "marked";
 
 // Cargar variables de entorno desde el archivo .env en src/backend
 dotenv.config({ path: path.resolve("./src/backend/.env") });
@@ -51,10 +52,11 @@ app.post("/chat", async (req, res) => {
       ]
     });
 
-    const reply = response?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                  "No se pudo generar respuesta";
-
-    res.json({ reply });
+  const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || 
+           "No se pudo generar respuesta";
+  // Formatear Markdown a HTML
+  const reply = marked.parse(rawReply);
+  res.json({ reply });
 
   } catch (error) {
     console.error("Error al comunicarse con Gemini:", error);

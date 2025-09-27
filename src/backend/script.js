@@ -15,9 +15,9 @@ button.addEventListener("click", async (e) => {
   }
 
   // Mostrar prompt en el chat
-  const userMsg = document.createElement("p");
-  userMsg.className = "font-bold text-blue-300 mb-2 px-4 sm:px-6";
-  userMsg.textContent = "Tú: " + prompt;
+  const userMsg = document.createElement("div");
+  userMsg.className = " text-end font-bold text-white  p-2 bg-[#2E3050] rounded-lg mb-2 px-4 sm:px-6";
+  userMsg.innerHTML = prompt;
   chatBox.appendChild(userMsg);
 
   input.value = "";
@@ -31,9 +31,9 @@ button.addEventListener("click", async (e) => {
 
     const data = await res.json();
 
-    const botMsg = document.createElement("p");
-    botMsg.className = "text-green-300 mb-4 px-4 sm:px-6";
-    botMsg.textContent = "MentorIA: " + data.reply;
+    const botMsg = document.createElement("div");
+    botMsg.className = "text-start text-white mb-4 px-4 p-2 bg-[#0C0C1C] rounded-lg sm:px-6 ";
+    botMsg.innerHTML = data.reply;
     chatBox.appendChild(botMsg);
 
     // Mantener el scroll al final

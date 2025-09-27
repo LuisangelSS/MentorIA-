@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentorIA</title>
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+        .animate-slideInLeft { animation: slideInLeft 0.5s ease-out; }
+        .animate-slideInRight { animation: slideInRight 0.5s ease-out; }
+        .animate-bounce-gentle { animation: bounce 2s infinite; }
+        .animate-pulse-gentle { animation: pulse 2s infinite; }
+        
+      
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #161B32;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #464973;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #A3B5CD;
+        }
+    </style>
+</head>
+<body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen">
+    <main class="animate-fadeIn">
+        
+        <div class="bg-[#464973] rounded-lg h-14 sm:h-16 lg:h-[7vh] flex items-center px-3 sm:px-4 border border-[#A3B5CD] animate-slideInLeft"> 
+            <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 animate-pulse-gentle">
+            <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
+        </div>  
+        
+        <div class="flex flex-col lg:flex-row gap-3 sm:gap-5 mt-3 min-h-[calc(100vh-120px)] lg:h-[87vh]">
+            
+            <div class="bg-[#464973] w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2 border border-[#A3B5CD] animate-slideInLeft order-2 lg:order-1"> 
+                
+                <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <i class='bx bx-home text-lg sm:text-xl pr-2'></i> 
+                    <p class="text-sm sm:text-base">Inicio</p>
+                </a>
+                <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <i class='bx bx-grid text-lg sm:text-xl pr-2'></i> 
+                    <p class="text-sm sm:text-base">Dashboard</p>
+                </a>
+                <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <i class='bx bx-message-question-mark text-lg sm:text-xl pr-2'></i>  
+                    <p class="text-sm sm:text-base">Quizzes</p>
+                </a>
+                
+                <h3 class="font-bold text-sm sm:text-base mt-2">Configuración de cuenta</h3>
+                <div class="h-full bg-[#161B32] rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
+                    
+                    <div class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#464973] rounded-full flex items-center justify-center">
+                            <i class='bx bx-user text-[#A3B5CD] text-lg sm:text-xl'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-[#A3B5CD] truncate">Usuario</p>
+                            <p class="text-xs text-[#8892b0] truncate">usuario@mentoria.com</p>
+                        </div>
+                    </div>
+                    
+                    
+                    <button class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform w-full text-left">
+                        <i class='bx bx-cog text-lg sm:text-xl text-[#A3B5CD]'></i>
+                        <span class="text-xs sm:text-sm">Configuración</span>
+                    </button>
+                    
+                    <button class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform w-full text-left">
+                        <i class='bx bx-user-circle text-lg sm:text-xl text-[#A3B5CD]'></i>
+                        <span class="text-xs sm:text-sm">Perfil</span>
+                    </button>
+                    
+                    
+                    <button class="flex items-center gap-3 p-3 bg-red-900/30 rounded-lg hover:bg-red-800/40 transition-all duration-300 hover:scale-105 transform w-full text-left mt-auto">
+                        <i class='bx bx-log-out text-lg sm:text-xl text-red-400'></i>
+                        <span class="text-xs sm:text-sm text-red-400">Cerrar sesión</span>
+                    </button>
+                </div>
+            </div> 
+            
+            
+            <div class="bg-[#161B32] w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 border border-[#A3B5CD] animate-slideInRight order-1 lg:order-2"> 
+                
+                <div class="rounded-xl flex-1 py-6 sm:py-10 flex flex-col justify-center items-center animate-fadeIn overflow-auto">
+                    <div class="mb-6 sm:mb-8">
+                        <div id="chat-logo" class="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-[#464973] rounded-full flex items-center justify-center">
+                            <img class='size-40 bx bx-brain text-3xl sm:text-8xl lg:text-9xl text-[#A3B5CD]' src="assets/svg/logo.svg"></img>
+                        </div>
+                        
+                        
+                    </div>
+            <div id="chat-box" class=" flex flex-col w-[1200px] overflow-y-auto bg-[#161B32] rounded-xl p-4 mt-6 mb-2 custom-scrollbar items-center"></div>
+                    <h1 id="chat-title" class="font-bold text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-center px-4 leading-tight">
+                        ¿Qué quieres estudiar hoy?
+                    </h1>
+                </div>
+                
+                <div class="sticky bottom-0 flex justify-center animate-fadeIn">
+                    <div class="w-full max-w-2xl bg-[#464973] rounded-2xl shadow-lg border border-[#A3B5CD]/20">
+                        <form action="#" method="post" class="flex items-center p-3 sm:p-4">
+                            <input 
+                                type="text" 
+                                placeholder="Escribe tu pregunta aquí..." 
+                                class="flex-1 bg-transparent outline-none text-white placeholder-[#A3B5CD]/70 text-sm sm:text-base px-2"
+                            >
+                            <button 
+                                type="submit" 
+                                class="ml-3 p-2 bg-[#161B32] rounded-xl hover:bg-[#2e3159] transition-all duration-300 hover:scale-110 transform"
+                            >
+                                <i class='bx bxs-send text-xl sm:text-2xl text-[#A3B5CD] hover:text-white transition-colors duration-300'></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <script src="../backend/script.js"></script>
+            </div> 
+        </div>
+    </main>

@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* Variables CSS para los colores de MentorIA */
+:root {
+  /* Colores primarios */
+  --color-primary-50: #f0f4f8;
+  --color-primary-100: #d9e6f2;
+  --color-primary-200: #b3cde0;
+  --color-primary-300: #A3B5CD;
+  --color-primary-400: #7a9cc6;
+  --color-primary-500: #5182b5;
+  --color-primary-600: #4a73a4;
+  --color-primary-700: #3d5f87;
+  --color-primary-800: #2f4a6a;
+  --color-primary-900: #1e3248;
+  
+  /* Colores secundarios */
+  --color-secondary-50: #f8f9fc;
+  --color-secondary-100: #e8ecf7;
+  --color-secondary-200: #d1d9ef;
+  --color-secondary-300: #b0bfe3;
+  --color-secondary-400: #8ba0d5;
+  --color-secondary-500: #6f84c7;
+  --color-secondary-600: #5a6fb8;
+  --color-secondary-700: #4f62a8;
+  --color-secondary-800: #464973;
+  --color-secondary-900: #3a4061;
+  
+  /* Colores oscuros */
+  --color-dark-50: #f6f7f9;
+  --color-dark-100: #eceef2;
+  --color-dark-200: #d5dae2;
+  --color-dark-300: #b0bcc9;
+  --color-dark-400: #859aac;
+  --color-dark-500: #677c91;
+  --color-dark-600: #526578;
+  --color-dark-700: #445462;
+  --color-dark-800: #3a4752;
+  --color-dark-900: #161B32;
+  --color-dark-950: #0C0C1C;
+  
+  /* Colores de acento */
+  --color-accent-50: #f0f9ff;
+  --color-accent-100: #e0f2fe;
+  --color-accent-200: #bae6fd;
+  --color-accent-300: #7dd3fc;
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0ea5e9;
+  --color-accent-600: #0284c7;
+  --color-accent-700: #0369a1;
+  --color-accent-800: #075985;
+  --color-accent-900: #0c4a6e;
+}
+
+/* Estilos base */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-dark-950);
+  color: var(--color-primary-300);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', system-ui, sans-serif;
+}
+
+/* Componentes personalizados */
+.btn-primary {
+  background-color: var(--color-accent-600);
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-700);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary-800);
+  color: var(--color-primary-300);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-700);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-dark-900);
+  border: 1px solid rgba(163, 181, 205, 0.3);
+  border-radius: 0.5rem;
+  color: var(--color-primary-300);
+  transition: border-color 0.2s;
+}
+
+.input-field::placeholder {
+  color: rgba(163, 181, 205, 0.6);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 1px var(--color-accent-500);
+}
+
+.card {
+  background-color: var(--color-secondary-800);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(163, 181, 205, 0.2);
+  box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.navbar {
+  background-color: var(--color-secondary-800);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(163, 181, 205, 0.2);
+  display: flex;
+  align-items: center;
+}
+
+.sidebar {
+  background-color: var(--color-secondary-800);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(163, 181, 205, 0.2);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: var(--color-dark-900);
+  width: 100%;
+  padding: 0.75rem;
+  color: var(--color-primary-300);
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  background-color: var(--color-dark-800);
+}

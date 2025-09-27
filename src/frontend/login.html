@@ -1,11 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MentorIA - Login</title>
+        <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    </head>
+    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-4 min-h-screen flex flex-col justify-center">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl 2xl:text-7xl text-white font-bold">¡Estás de vuelta!</h1>
+            <p class="text-3xl 2xl:text-5xl mt-2 text-[#8E94E5] font-bold">¿Qué vamos a aprender hoy?</p>
+        </header>
+
+        <!-- Contenedor Login + Imagen -->
+        <div class="flex flex-col xl:flex-row items-center justify-center gap-12 w-[90%] max-w-6xl mx-auto">
+            <!-- Formulario -->
+            <div class="w-[22rem] 2xl:w-[26rem] bg-[#0C0C1C] border rounded-2xl p-6 shadow-lg">
+                <h2 class="mb-5 font-black text-3xl text-white">Iniciar sesión</h2>
+
+                <!-- Mensaje de estado -->
+                <div id="message" class="hidden mb-4 p-3 rounded-lg text-center font-bold"></div>
+
+                <form id="loginForm" class="flex flex-col">
+                    <label class="font-bold mb-2" for="username">
+                        Nombre de usuario
+                        <input type="text" name="username" id="username" placeholder="John Doe" class="mt-1 p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" required />
+                    </label>
+
+                    <label class="font-bold mb-8" for="password">
+                        Contraseña
+                        <input type="password" name="password" id="password" placeholder="MentorIA1234" class="mt-1 p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" required />
+                    </label>
+
+                    
+
+                    <button type="submit" id="submitBtn" class="hover:cursor-pointer hover:bg-gray-300 p-3 bg-white text-[#0C0C1C] font-black text-xl rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">Login</button>
+                </form>
+
+                <div class="flex justify-center mt-3">
+                    <a class="text-white" href="registro.html">
+                        ¿No tienes una cuenta?
+                        <span class="font-bold">Crear una.</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Imagen / Logo -->
+            <div class="flex justify-center">
+                <a href="index.html">
+                    <img class="2xl:w-[26rem] w-[20rem]" src="assets/svg/MentorIA-logo.svg" alt="MentorIA logo" />
+                </a>
+            </div>
+        </div>
+
+        <script src="../backend/login.js"></script>
+    </body>
 </html>

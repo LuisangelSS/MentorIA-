@@ -4,27 +4,42 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>MentorIA - Inicio</title>
-        <script src="script.js"></script>
+        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+        <script src="../backend/assets/particles.js"></script>
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <link rel="stylesheet" href="css/style.css" />
     </head>
-    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen h-[100vh]">
-        <header class="flex justify-between p-4 bg-[#464973] rounded-lg">
-            <div class="flex">
+    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen h-[100vh] flex flex-col">
+        <!-- HEADER -->
+        <header data-aos="fade-up" data-aos-delay="300" class="flex sm:flex-row justify-between items-center gap-4 p-4 bg-[#464973] rounded-lg">
+            <a href="#" class="flex items-center gap-2">
                 <img src="assets/svg/logo.svg" alt="Logo" class="size-10" />
-                <h1 class="font-black text-2xl content-center">MentorIA</h1>
-            </div>
+                <h1 class="font-black text-2xl">MentorIA</h1>
+            </a>
             <nav>
-                <ul class="flex gap-5">
-                    <a class="p-2 px-8 rounded-lg border-[#A3B5CD] border-1" href="login.html"><li>Iniciar sesión</li></a>
-                    <a class="p-2 px-8 rounded-lg border-[#A3B5CD] bg-[#161B32]" href="registro.html"><li>Registrarse</li></a>
+                <ul class="flex gap-4 sm:gap-6">
+                    <li>
+                        <a class="p-2 px-6 rounded-lg border border-[#A3B5CD] text-center hover:bg-[#5b5f80] hover:text-white transition-colors" href="login.html">Iniciar sesión</a>
+                    </li>
+                    <li>
+                        <a class="p-2 px-6 rounded-lg border border-[#A3B5CD] bg-[#161B32] text-center hover:bg-[#8E94E5] hover:text-[#161B32] transition-colors" href="registro.html">Registrarse</a>
+                    </li>
                 </ul>
             </nav>
         </header>
 
-        <main class="flex justify-around">
-            <div class="w-[90vh] mt-20">
-                <h2 class="leading-normal text-5xl 2xl:text-7xl 2xl:mb-40 text-center mb-20">
+        <!-- MAIN -->
+        <main class="flex flex-col lg:flex-row items-center justify-between flex-1 gap-10 mt-10">
+            <!-- Imagen lateral -->
+            <div data-aos="fade-up" data-aos-delay="400" class="w-full max-w-md lg:max-w-lg">
+                <img src="assets/png/ilustracion 1.png" alt="Ilustración" class="w-full h-auto" />
+            </div>
+
+            <!-- Texto y botones -->
+            <div class="flex flex-col items-center lg:items-start text-center lg:text-center gap-10">
+                <h2 data-aos="fade-up" data-aos-delay="500" class="text-white leading-snug text-4xl sm:text-6xl 2xl:text-8xl font-light">
                     El
                     <span class="font-black text-[#8E94E5]">mejor</span>
                     lugar para
@@ -34,32 +49,21 @@
                 </h2>
 
                 <!-- Botones principales -->
-                <div class="flex gap-5 justify-center mb-5">
-                    <a href="login.html">
-                        <div class="w-48 p-2 bg-[#161B32] text-[#A3B5CD] border-1 rounded-lg text-center">
-                            <p>Iniciar sesión</p>
-                        </div>
-                    </a>
-                    <a href="registro.html">
-                        <div class="w-48 p-2 text-[#A3B5CD] border-1 rounded-lg text-center">
-                            <p>Registrarse</p>
-                        </div>
-                    </a>
+                <div data-aos="fade-up" data-aos-delay="600" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center mx-auto">
+                    <a href="login.html" class="w-full sm:w-48 p-3 bg-[#161B32] text-[#A3B5CD] border rounded-lg text-center hover:bg-[#1f233c] hover:text-white transition-colors">Iniciar sesión</a>
+                    <a href="registro.html" class="w-full sm:w-48 p-3 text-[#A3B5CD] border rounded-lg text-center hover:bg-[#8E94E5] hover:text-[#161B32] transition-colors">Registrarse</a>
                 </div>
 
                 <!-- Botón GitHub -->
-                <div class="w-80 m-auto">
-                    <a href="https://github.com/LuisangelSS/MentorIA-/" target="_blank" rel="noopener noreferrer" class="flex m-auto justify-center gap-2 p-2 bg-[#8E94E5] text-[#161B32] rounded-lg cursor-pointer hover:bg-[#7b82d9] transition-colors">
-                        <img src="assets/svg/github-mark.svg" alt="GitHub Logo" class="w-5 h-5 mt-1" />
-                        <span class="font-bold">Star this project on GitHub</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Imagen lateral -->
-            <div>
-                <img src="assets/png/ilustracion 1.png" alt="" class="h-[65vh] mt-18" />
+                <a data-aos="fade-up" data-aos-delay="700"href="https://github.com/LuisangelSS/MentorIA-/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 p-3  bg-[#8E94E5] text-[#161B32] rounded-lg hover:bg-[#7b82d9] transition-colors w-full sm:w-80 mx-auto mb-10">
+                    <img src="assets/svg/github-mark.svg" alt="GitHub Logo" class="w-5 h-5" />
+                    <span class="font-bold">Star this project on GitHub</span>
+                </a>
             </div>
         </main>
+        <div id="particles-js" class="absolute top-0 left-0 w-full h-full -z-10"></div>
     </body>
+    <script>
+        AOS.init();
+    </script>
 </html>

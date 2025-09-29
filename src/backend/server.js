@@ -79,6 +79,26 @@ app.post("/logout", (req, res) => {
   res.json({ message: "Logout exitoso" });
 });
 
+// Endpoint para obtener información del usuario autenticado
+app.get("/user-info", (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) {
+    return res.status(401).json({ error: "Token de autorización requerido" });
+  }
+
+  const session = validateSession(token);
+  if (!session) {
+    return res.status(401).json({ error: "Token inválido o expirado" });
+  }
+
+  // Devolver información del usuario sin datos sensibles
+  res.json({
+    id: session.user_id,
+    username: session.username,
+    email: session.email
+  });
+});
+
 // -----------------------------
 // Endpoint de chat con Gemini
 // -----------------------------

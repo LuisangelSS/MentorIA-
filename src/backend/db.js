@@ -112,4 +112,52 @@ export function deleteSession(token) {
     stmt.run(token);
 }
 
+// ----------------------------
+// FUNCIONES DE ACTUALIZACIÓN DE PERFIL
+// ----------------------------
+
+// Actualizar nombre de usuario
+export function updateUsername(userId, newUsername) {
+    // Verificar que el username no esté en uso
+    const checkStmt = db.prepare(`SELECT id FROM users WHERE username = ? AND id != ?`);
+    const existing = checkStmt.get(newUsername, userId);
+    if (existing) {
+        throw new Error('El nombre de usuario ya está en uso');
+    }
+    
+    const stmt = db.prepare(`UPDATE users SET username = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+    const result = stmt.run(newUsername, userId);
+    return result.changes > 0;
+}
+
+// Actualizar email
+export function updateEmail(userId, newEmail) {
+    // Verificar que el email no esté en uso
+    const checkStmt = db.prepare(`SELECT id FROM users WHERE email = ? AND id != ?`);
+    const existing = checkStmt.get(newEmail, userId);
+    if (existing) {
+        throw new Error('El email ya está en uso');
+    }
+    
+    const stmt = db.prepare(`UPDATE users SET email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+    const result = stmt.run(newEmail, userId);
+    return result.changes > 0;
+}
+
+// Actualizar contraseña
+export function updatePassword(userId, newPassword) {
+    const passwordHash = hashPassword(newPassword);
+    const stmt = db.prepare(`UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+    const result = stmt.run(passwordHash, userId);
+    return result.changes > 0;
+}
+
+// Verificar contraseña actual del usuario
+export function verifyCurrentPassword(userId, currentPassword) {
+    const stmt = db.prepare(`SELECT password_hash FROM users WHERE id = ?`);
+    const user = stmt.get(userId);
+    if (!user) return false;
+    return verifyPassword(currentPassword, user.password_hash);
+}
+
 export default db;

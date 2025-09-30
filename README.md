@@ -9,20 +9,20 @@
 [![SQLite](https://img.shields.io/badge/Sqlite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[🚀 Demo](#preview) • [📖 Documentación](#-documentación) • [🤝 Contribuir](#contribuir)
+[🚀 Demo](#preview) • [📖 Documentacion](#-documentacion) • [🤝 Contribuir](#contribuir)
 
 </div>
 
 ---
 
-## 📋 Documentación
+## 📋 Documentacion
 
-- [Descripción](#descripción)
-- [Características principales](#características-principales)
+- [Descripcion](#descripcion)
+- [Caracteristicas principales](#caracteristicas-principales)
 - [Objetivo del proyecto](#objetivo-del-proyecto)
-- [Instalación y configuración](#instalación-y-configuración)
+- [Instalacion y configuracion](#instalacion-y-configuracion)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
-- [Stack tecnológico](#stack-tecnológico)
+- [Stack tecnologico](#stack-tecnologico)
 - [Funcionalidades](#funcionalidades)
 - [API Endpoints](#api-endpoints)
 - [Preview](#preview)
@@ -32,7 +32,7 @@
 
 ---
 
-## Descripción
+## Descripcion
 
 **MentorIA** es una plataforma de aprendizaje revolucionaria que utiliza inteligencia artificial para transformar la educación mediante un enfoque personalizado y adaptativo. 
 
@@ -46,7 +46,7 @@ Todo esto impulsado por **Google Gemini AI** para proporcionar una experiencia e
 
 ---
 
-## Características principales
+## Caracteristicas principales
 
 - 🤖 **Chat inteligente con IA**: Interactúa con MentorIA para resolver dudas y recibir explicaciones personalizadas
 - 🔐 **Sistema de autenticación**: Registro e inicio de sesión seguro con gestión de sesiones
@@ -69,7 +69,7 @@ Todo esto impulsado por **Google Gemini AI** para proporcionar una experiencia e
 
 ---
 
-## Instalación y configuración
+## Instalacion y configuracion
 
 ### Prerrequisitos
 
@@ -180,7 +180,7 @@ MentorIA/
 
 ---
 
-## Stack tecnológico
+## Stack tecnologico
 
 ### Backend
 ![Node.js](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)

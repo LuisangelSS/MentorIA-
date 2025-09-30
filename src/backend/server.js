@@ -5,6 +5,8 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import path from "path";
 import { marked } from "marked";
+import { exec } from "child_process";
+import { fileURLToPath } from "url";
 
 // -----------------------------
 // Importar funciones de la base de datos
@@ -16,7 +18,7 @@ import {
   createSession,
   validateSession,
   deleteSession
-} from "./db.js"; // <- db.js está en la misma carpeta que server.js
+} from "./db.js"; 
 
 // -----------------------------
 // Cargar variables de entorno
@@ -138,8 +140,44 @@ app.post("/chat", async (req, res) => {
 });
 
 // -----------------------------
+// Función para abrir el navegador
+// -----------------------------
+function openBrowser(url) {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const indexPath = path.join(__dirname, '../frontend/index.html');
+  
+  let command;
+  switch (process.platform) {
+    case 'darwin': // macOS
+      command = `open "${indexPath}"`;
+      break;
+    case 'win32': // Windows
+      command = `start "" "${indexPath}"`;
+      break;
+    default: // Linux y otros
+      command = `xdg-open "${indexPath}"`;
+      break;
+  }
+  
+  exec(command, (error) => {
+    if (error) {
+      console.log('⚠️  No se pudo abrir el navegador automáticamente');
+      console.log(`📖 Abre manualmente: ${indexPath}`);
+    } else {
+      console.log('🌐 Navegador abierto automáticamente');
+    }
+  });
+}
+
+// -----------------------------
 // Iniciar servidor
 // -----------------------------
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  
+  // Abrir el navegador automáticamente 
+  setTimeout(() => {
+    openBrowser();
+  }, 1000);
 });

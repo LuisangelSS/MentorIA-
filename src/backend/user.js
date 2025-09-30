@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Configurar el botón de logout
     setupLogoutButton();
+    
+    // Configurar el botón de perfil
+    setupProfileButton();
 });
 
 async function loadUserInfo() {
@@ -56,6 +59,15 @@ function setupLogoutButton() {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
+    }
+}
+
+function setupProfileButton() {
+    const profileBtn = document.getElementById('profile-btn');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+        });
     }
 }
 

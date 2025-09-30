@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - MentorIA</title>
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="../backend/assets/particles.js"></script>
+</head>
+<body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen">
+    <main class="animate-fadeIn">
+        
+        <!-- Header -->
+        <div class="bg-[#464973] rounded-lg h-14 sm:h-16 lg:h-[7vh] flex items-center justify-between px-3 sm:px-4 border border-[#A3B5CD] animate-slideInLeft"> 
+            <div class="flex items-center">
+                <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 animate-pulse-gentle">
+                <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA - Perfil</h2>
+            </div>
+            <button onclick="goBack()" class="flex items-center gap-2 p-2 bg-[#161B32] rounded-lg hover:bg-[#2e3159] transition-all duration-300">
+                <i class='bx bx-arrow-back text-lg'></i>
+                <span class="hidden sm:inline text-sm">Volver</span>
+            </button>
+        </div>  
+        
+        <div class="flex justify-center mt-6">
+            <div class="bg-[#464973] w-full max-w-3xl rounded-lg p-4 sm:p-6 border border-[#A3B5CD] animate-slideInUp">
+                
+                <!-- Mensaje de estado -->
+                <div id="message" class="hidden mb-4 p-3 rounded-lg text-center font-bold"></div>
+                
+                <!-- Información actual del usuario -->
+                <div class="mb-6 p-4 bg-[#161B32] rounded-lg">
+                    <h3 class="text-lg font-bold mb-4 text-white flex items-center">
+                        <i class='bx bx-user-circle mr-2 text-2xl'></i>
+                        Información Actual
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-[#A3B5CD]">Nombre de usuario actual</label>
+                            <p id="current-username" class="text-white bg-[#2e3159] p-2 rounded font-medium">Cargando...</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-[#A3B5CD]">Correo electrónico actual</label>
+                            <p id="current-email" class="text-white bg-[#2e3159] p-2 rounded font-medium">Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulario único de edición -->
+                <div class="bg-[#161B32] p-4 sm:p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-6 text-white flex items-center">
+                        <i class='bx bx-edit mr-2 text-2xl'></i>
+                        Editar Perfil
+                    </h3>
+                    
+                    <form id="profileForm" class="space-y-6">
+                        <!-- Cambiar nombre de usuario -->
+                        <div>
+                            <label for="newUsername" class="block text-sm font-medium mb-2 text-[#A3B5CD] flex items-center">
+                                <i class='bx bx-user mr-2'></i>
+                                Nuevo nombre de usuario (opcional)
+                            </label>
+                            <input 
+                                type="text" 
+                                id="newUsername" 
+                                name="newUsername" 
+                                class="w-full p-3 bg-[#2e3159] border border-[#A3B5CD]/30 rounded focus:border-[#A3B5CD] focus:outline-none text-white placeholder-[#A3B5CD]/50 transition-all duration-300"
+                                placeholder="Dejar vacío si no quiere cambiar"
+                                minlength="3"
+                            >
+                            <p class="text-xs text-[#8892b0] mt-1">Mínimo 3 caracteres</p>
+                        </div>
+                        
+                        <!-- Cambiar email -->
+                        <div>
+                            <label for="newEmail" class="block text-sm font-medium mb-2 text-[#A3B5CD] flex items-center">
+                                <i class='bx bx-envelope mr-2'></i>
+                                Nuevo correo electrónico (opcional)
+                            </label>
+                            <input 
+                                type="email" 
+                                id="newEmail" 
+                                name="newEmail" 
+                                class="w-full p-3 bg-[#2e3159] border border-[#A3B5CD]/30 rounded focus:border-[#A3B5CD] focus:outline-none text-white placeholder-[#A3B5CD]/50 transition-all duration-300"
+                                placeholder="Dejar vacío si no quiere cambiar"
+                            >
+                        </div>
+                        
+                        <!-- Divider -->
+                        <div class="border-t border-[#A3B5CD]/20 pt-6">
+                            <h4 class="text-lg font-bold mb-4 text-white flex items-center">
+                                <i class='bx bx-lock mr-2'></i>
+                                Cambiar Contraseña (opcional)
+                            </h4>
+                            <p class="text-sm text-[#8892b0] mb-4">Solo complete estos campos si desea cambiar su contraseña</p>
+                        </div>
+                        
+                        <!-- Cambiar contraseña -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="currentPassword" class="block text-sm font-medium mb-2 text-[#A3B5CD]">Contraseña actual</label>
+                                <input 
+                                    type="password" 
+                                    id="currentPassword" 
+                                    name="currentPassword" 
+                                    class="w-full p-3 bg-[#2e3159] border border-[#A3B5CD]/30 rounded focus:border-[#A3B5CD] focus:outline-none text-white placeholder-[#A3B5CD]/50 transition-all duration-300"
+                                    placeholder="Solo si cambia contraseña"
+                                >
+                            </div>
+                            <div>
+                                <label for="newPassword" class="block text-sm font-medium mb-2 text-[#A3B5CD]">Nueva contraseña</label>
+                                <input 
+                                    type="password" 
+                                    id="newPassword" 
+                                    name="newPassword" 
+                                    class="w-full p-3 bg-[#2e3159] border border-[#A3B5CD]/30 rounded focus:border-[#A3B5CD] focus:outline-none text-white placeholder-[#A3B5CD]/50 transition-all duration-300"
+                                    placeholder="Mínimo 6 caracteres"
+                                    minlength="6"
+                                >
+                            </div>
+                            <div>
+                                <label for="confirmPassword" class="block text-sm font-medium mb-2 text-[#A3B5CD]">Confirmar contraseña</label>
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    class="w-full p-3 bg-[#2e3159] border border-[#A3B5CD]/30 rounded focus:border-[#A3B5CD] focus:outline-none text-white placeholder-[#A3B5CD]/50 transition-all duration-300"
+                                    placeholder="Repetir nueva contraseña"
+                                    minlength="6"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-6">
+                            <button 
+                                type="button"
+                                onclick="goBack()" 
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center justify-center"
+                            >
+                                <i class='bx bx-arrow-back mr-2'></i>
+                                Volver sin Guardar
+                            </button>
+                            <button 
+                                type="submit" 
+                                id="saveBtn"
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center justify-center"
+                            >
+                                <i class='bx bx-save mr-2'></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                        
+                        <div class="text-center text-sm text-[#8892b0] mt-4">
+                            <i class='bx bx-info-circle mr-1'></i>
+                            Después de guardar será redirigido al login
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div id="particles-js" class="absolute top-0 left-0 w-full h-full -z-10"></div>
+    </main>
+
+    <script>
+        function goBack() {
+            window.location.href = 'app.html';
+        }
+    </script>
+    <script src="../backend/profile.js"></script>
+</body>
+</html>

@@ -33,7 +33,7 @@ async function handleLogin(e) {
     submitBtn.textContent = 'Iniciando sesión...';
     
     try {
-        const response = await fetch('http://localhost:3000/login', {
+const response = await fetch('/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(loginData)
@@ -44,7 +44,7 @@ async function handleLogin(e) {
         if (response.ok) {
             localStorage.setItem('userToken', result.token);
             localStorage.setItem('tokenExpiry', result.expiresAt);
-            window.location.href = '../frontend/app.html'; 
+            window.location.href = '/app'; 
 
             showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
             e.target.reset();
@@ -64,12 +64,12 @@ async function handleLogin(e) {
 
 async function verifyTokenAndRedirect(token) {
     try {
-        const response = await fetch('http://localhost:3000/user-info', {
+const response = await fetch('/user-info', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
-            window.location.href = './app.html';
+            window.location.href = '/app';
         } else {
             localStorage.removeItem('userToken');
             localStorage.removeItem('tokenExpiry');

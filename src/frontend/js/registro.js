@@ -24,7 +24,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             submitBtn.textContent = 'Creando cuenta...';
             
             try {
-                const response = await fetch('http://localhost:3000/register', {
+const response = await fetch('/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
@@ -32,10 +32,12 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
                 const result = await response.json();
                 
-                if (response.ok) {
-                    window.location.href = '../frontend/app.html';
-                    showMessage('¡Cuenta creada exitosamente! Redirigiendo...', 'success');
+if (response.ok) {
+                    showMessage('¡Cuenta creada exitosamente! Redirigiendo a inicio de sesión...', 'success');
                     e.target.reset();
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 1500);
 
                     // setTimeout(() => {
                     //     // Redirige a app.html

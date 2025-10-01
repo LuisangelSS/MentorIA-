@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Verificar autenticación
     const userToken = localStorage.getItem('userToken');
     if (!userToken) {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
         return;
     }
 
@@ -18,7 +18,7 @@ async function loadUserInfo() {
     const userToken = localStorage.getItem('userToken');
     
     try {
-        const response = await fetch('http://localhost:3000/user-info', {
+const response = await fetch('/user-info', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${userToken}`,
@@ -33,7 +33,7 @@ async function loadUserInfo() {
         } else {
             showMessage('Error al cargar la información del usuario', 'error');
             setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }, 2000);
         }
     } catch (error) {
@@ -143,7 +143,7 @@ async function updateProfile(profileData) {
     saveBtn.innerHTML = '<i class="bx bx-loader-alt animate-spin mr-2"></i>Guardando...';
     
     try {
-        const response = await fetch('http://localhost:3000/profile/update-all', {
+const response = await fetch('/profile/update-all', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${userToken}`,
@@ -164,7 +164,7 @@ async function updateProfile(profileData) {
                 localStorage.removeItem('tokenExpiry');
                 
                 // Redirigir al login
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }, 3000); // 3 segundos para que el usuario lea el mensaje
             
         } else {

@@ -35,6 +35,11 @@ dotenv.config({ path: path.resolve("./src/backend/.env") });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rutas absolutas útiles
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const FRONTEND_DIR = path.join(__dirname, '../frontend');
+
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
 if (!process.env.GOOGLE_API_KEY) {
@@ -45,35 +50,35 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Servir archivos estáticos desde la carpeta frontend
-app.use(express.static(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend')));
+app.use(express.static(FRONTEND_DIR));
 
 // -----------------------------
 // Rutas para servir páginas HTML
 // -----------------------------
 
-// Ruta raíz - redirigir a index.html
+// Ruta raíz - servir index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/index.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 
 // Ruta para la página de login
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/login.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'login.html'));
 });
 
 // Ruta para la página de registro
 app.get('/register', (req, res) => {
-  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/registro.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'registro.html'));
 });
 
 // Ruta para la aplicación principal
 app.get('/app', (req, res) => {
-  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/app.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'app.html'));
 });
 
 // Ruta para el perfil de usuario
 app.get('/profile', (req, res) => {
-  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/profile.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
 });
 
 // -----------------------------

@@ -18,7 +18,7 @@ button.addEventListener("click", async (e) => {
 
   // Mostrar prompt en el chat
   const userMsg = document.createElement("div");
-  userMsg.className = "animate-fadeIn w-[900px] ml-10 text-end font-bold text-white  p-5 bg-[#2E3050] rounded-lg mb-8 px-4 sm:px-6";
+  userMsg.className = "animate-fadeIn w-[800px] ml-10 text-end font-bold text-white  p-5 bg-[#2E3050] rounded-lg mb-8 px-4 sm:px-6";
   userMsg.innerHTML = prompt;
   chatBox.appendChild(userMsg);
 

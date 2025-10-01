@@ -44,6 +44,38 @@ if (!process.env.GOOGLE_API_KEY) {
 app.use(cors());
 app.use(bodyParser.json());
 
+// Servir archivos estáticos desde la carpeta frontend
+app.use(express.static(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend')));
+
+// -----------------------------
+// Rutas para servir páginas HTML
+// -----------------------------
+
+// Ruta raíz - redirigir a index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/index.html'));
+});
+
+// Ruta para la página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/login.html'));
+});
+
+// Ruta para la página de registro
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/registro.html'));
+});
+
+// Ruta para la aplicación principal
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/app.html'));
+});
+
+// Ruta para el perfil de usuario
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend/profile.html'));
+});
+
 // -----------------------------
 // Endpoints de usuario / sesión
 // -----------------------------
@@ -325,30 +357,28 @@ app.post("/chat", async (req, res) => {
 // -----------------------------
 // Función para abrir el navegador
 // -----------------------------
-function openBrowser(url) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const indexPath = path.join(__dirname, '../frontend/index.html');
+function openBrowser() {
+  const serverUrl = `http://localhost:${PORT}`;
   
   let command;
   switch (process.platform) {
     case 'darwin': // macOS
-      command = `open "${indexPath}"`;
+      command = `open "${serverUrl}"`;
       break;
     case 'win32': // Windows
-      command = `start "" "${indexPath}"`;
+      command = `start "" "${serverUrl}"`;
       break;
     default: // Linux y otros
-      command = `xdg-open "${indexPath}"`;
+      command = `xdg-open "${serverUrl}"`;
       break;
   }
   
   exec(command, (error) => {
     if (error) {
       console.log('⚠️  No se pudo abrir el navegador automáticamente');
-      console.log(`📖 Abre manualmente: ${indexPath}`);
+      console.log(`📖 Abre manualmente: ${serverUrl}`);
     } else {
-      console.log('🌐 Navegador abierto automáticamente');
+      console.log(`🌐 Navegador abierto automáticamente en ${serverUrl}`);
     }
   });
 }

@@ -35,25 +35,15 @@
 
                     <h3 class="font-bold text-sm sm:text-base mt-2">Configuración de cuenta</h3>
                     <div class="h-full bg-[#161B32] rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
-                        <div class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#464973] rounded-full flex items-center justify-center">
-                                <i class="bx bx-user text-[#A3B5CD] text-lg sm:text-xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p id="user-name" class="text-xs sm:text-sm font-medium text-[#A3B5CD] truncate">Cargando...</p>
-                                <p id="user-email" class="text-xs text-[#8892b0] truncate">Cargando...</p>
-                            </div>
+                    <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform cursor-pointer">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#464973] rounded-full flex items-center justify-center">
+                            <i class='bx bx-user text-[#A3B5CD] text-lg sm:text-xl'></i>
                         </div>
-
-                        <button class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform w-full text-left">
-                            <i class="bx bx-cog text-lg sm:text-xl text-[#A3B5CD]"></i>
-                            <span class="text-xs sm:text-sm">Configuración</span>
-                        </button>
-
-                        <button id="profile-btn" class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform w-full text-left">
-                            <i class="bx bx-user-circle text-lg sm:text-xl text-[#A3B5CD]"></i>
-                            <span class="text-xs sm:text-sm">Perfil</span>
-                        </button>
+                        <div class="flex-1 min-w-0">
+                            <p id="user-name" class="text-xs sm:text-sm font-medium text-[#A3B5CD] truncate">Cargando...</p>
+                            <p id="user-email" class="text-xs text-[#8892b0] truncate">Cargando...</p>
+                        </div>
+                    </div>
 
                         <button id="logout-btn" class="flex items-center gap-3 p-3 bg-red-900/30 rounded-lg hover:bg-red-800/40 transition-all duration-300 hover:scale-105 transform w-full text-left mt-auto">
                             <i class="bx bx-log-out text-lg sm:text-xl text-red-400"></i>

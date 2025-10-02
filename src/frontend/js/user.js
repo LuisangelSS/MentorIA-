@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Configurar el botón de logout
     setupLogoutButton();
     
-    // Configurar el botón de perfil
-    setupProfileButton();
+    // Hacer clickeable la tarjeta de cuenta (usuario/email)
+    setupAccountCardHandler();
 });
 
 async function loadUserInfo() {
@@ -62,11 +62,16 @@ function setupLogoutButton() {
     }
 }
 
-function setupProfileButton() {
-    const profileBtn = document.getElementById('profile-btn');
-    if (profileBtn) {
-        profileBtn.addEventListener('click', () => {
-            window.location.href = '/profile';
+function setupAccountCardHandler() {
+    const card = document.getElementById('account-card');
+    if (card) {
+        const goProfile = () => window.location.href = '/profile';
+        card.addEventListener('click', goProfile);
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                goProfile();
+            }
         });
     }
 }

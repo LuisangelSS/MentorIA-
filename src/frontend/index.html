@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>MentorIA - Inicio</title>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-        <script src="../backend/assets/particles.js"></script>
+        <script src="assets/particles.js"></script>
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/style.css" />
         <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png">
     </head>
-    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen h-[100vh] flex flex-col">
+    <body class="bg-background text-text p-2 sm:p-4 min-h-screen h-[100vh] flex flex-col">
         <!-- HEADER -->
-        <header data-aos="fade-up" data-aos-delay="300" class="flex sm:flex-row justify-between items-center gap-4 p-4 bg-[#464973] rounded-lg">
-            <a href="index.html" class="flex items-center gap-2">
-                <img src="assets/svg/logo.svg" alt="Logo" class="size-10" />
+        <header data-aos="fade-up" data-aos-delay="300" class="flex sm:flex-row justify-between items-center gap-4 p-4 bg-secondary rounded-lg">
+            <a href="/" class="flex items-center gap-2">
+                <img src="assets/svg/logo.svg" alt="Logo" class=" size-10" />
                 <h1 class="font-black hidden sm:flex text-2xl">MentorIA</h1>
             </a>
             <nav>
                 <ul class="flex gap-4 sm:gap-6">
                     <li>
-                        <a class="p-2 px-6 rounded-lg border border-[#A3B5CD] text-center hover:bg-[#5b5f80] hover:text-white transition-colors" href="login.html">Iniciar sesión</a>
+                        <a class="p-2 px-6 rounded-lg border border-text text-center hover:bg-[#5b5f80] hover:text-text transition-colors" href="/login">Iniciar sesión</a>
                     </li>
                     <li>
-                        <a class="p-2 px-6 rounded-lg border border-[#A3B5CD] bg-[#161B32] text-center hover:bg-[#8E94E5] hover:text-[#161B32] transition-colors" href="registro.html">Registrarse</a>
+                        <a class="p-2 px-6 rounded-lg border border-text bg-background-light text-center hover:bg-accent hover:text-background-light transition-colors" href="/register">Registrarse</a>
                     </li>
                 </ul>
             </nav>
@@ -35,30 +35,30 @@
         <main class="flex flex-col lg:flex-row items-center justify-between flex-1 gap-10 mt-10">
             <!-- Imagen lateral -->
             <div data-aos="fade-up" data-aos-delay="400" class="w-full max-w-md lg:max-w-lg">
-                <img src="assets/png/ilustracion 1.png" alt="Ilustración" class="w-full h-auto" />
+                <img src="assets/svg/MentorIA-logo.svg" alt="Ilustración" class="w-full h-auto" />
             </div>
 
             <!-- Texto y botones -->
             <div class="flex flex-col items-center lg:items-start text-center lg:text-center gap-10">
-                <h2 data-aos="fade-up" data-aos-delay="500" class="text-white leading-snug text-4xl sm:text-6xl 2xl:text-8xl font-light">
+                <h2 data-aos="fade-up" data-aos-delay="500" class="text-text leading-snug text-4xl sm:text-6xl 2xl:text-8xl font-light">
                     El
-                    <span class="font-black text-[#8E94E5]">mejor</span>
+                    <span class="font-black text-accent">mejor</span>
                     lugar para
-                    <span class="font-black text-[#8E94E5]">estudiar</span>
+                    <span class="font-black text-accent">estudiar</span>
                     con
-                    <span class="font-black text-[#8E94E5]">IA</span>
+                    <span class="font-black text-accent">IA</span>
                 </h2>
 
                 <!-- Botones principales -->
                 <div data-aos="fade-up" data-aos-delay="600" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center mx-auto">
-                    <a href="login.html" class="w-full sm:w-48 p-3 bg-[#161B32] text-[#A3B5CD] border rounded-lg text-center hover:bg-[#1f233c] hover:text-white transition-colors">Iniciar sesión</a>
-                    <a href="registro.html" class="w-full sm:w-48 p-3 text-[#A3B5CD] border rounded-lg text-center hover:bg-[#8E94E5] hover:text-[#161B32] transition-colors">Registrarse</a>
+                    <a href="/login" class="w-full sm:w-48 p-3 bg-background-light text-text border rounded-lg text-center hover:bg-[#1f233c] hover:text-text transition-colors">Iniciar sesión</a>
+                    <a href="/register" class="w-full sm:w-48 p-3 text-text border rounded-lg text-center hover:bg-accent hover:text-background-light transition-colors">Registrarse</a>
                 </div>
 
                 <!-- Botón GitHub -->
-                <a href="https://github.com/LuisangelSS/MentorIA-/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 p-3  bg-[#8E94E5] text-[#161B32] rounded-lg hover:bg-[#7b82d9] transition-colors w-full sm:w-80 mx-auto mb-10">
+                <a href="https://github.com/LuisangelSS/MentorIA-/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 p-3  bg-accent text-background-light rounded-lg hover:bg-[#7b82d9] transition-colors w-full sm:w-80 mx-auto mb-10">
                     <img src="assets/svg/github-mark.svg" alt="GitHub Logo" class="w-5 h-5" />
-                    <span class="font-bold">Star this project on GitHub</span>
+                    <span class="font-bold text-text">Star this project on GitHub</span>
                 </a>
             </div>
         </main>

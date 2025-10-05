@@ -35,6 +35,11 @@ dotenv.config({ path: path.resolve("./src/backend/.env") });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rutas absolutas útiles
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const FRONTEND_DIR = path.join(__dirname, '../frontend');
+
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
 if (!process.env.GOOGLE_API_KEY) {
@@ -43,6 +48,42 @@ if (!process.env.GOOGLE_API_KEY) {
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Servir archivos estáticos desde la carpeta frontend
+app.use(express.static(FRONTEND_DIR));
+
+
+
+
+
+// -----------------------------
+// Rutas para servir páginas HTML
+// -----------------------------
+
+// Ruta raíz - servir index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+});
+
+// Ruta para la página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'login.html'));
+});
+
+// Ruta para la página de registro
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'registro.html'));
+});
+
+// Ruta para la aplicación principal
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'app.html'));
+});
+
+// Ruta para el perfil de usuario
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
+});
 
 // -----------------------------
 // Endpoints de usuario / sesión
@@ -325,33 +366,39 @@ app.post("/chat", async (req, res) => {
 // -----------------------------
 // Función para abrir el navegador
 // -----------------------------
-function openBrowser(url) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const indexPath = path.join(__dirname, '../frontend/index.html');
+function openBrowser() {
+  const serverUrl = `http://localhost:${PORT}`;
   
   let command;
   switch (process.platform) {
     case 'darwin': // macOS
-      command = `open "${indexPath}"`;
+      command = `open "${serverUrl}"`;
       break;
     case 'win32': // Windows
-      command = `start "" "${indexPath}"`;
+      command = `start "" "${serverUrl}"`;
       break;
     default: // Linux y otros
-      command = `xdg-open "${indexPath}"`;
+      command = `xdg-open "${serverUrl}"`;
       break;
   }
   
   exec(command, (error) => {
     if (error) {
       console.log('⚠️  No se pudo abrir el navegador automáticamente');
-      console.log(`📖 Abre manualmente: ${indexPath}`);
+      console.log(`📖 Abre manualmente: ${serverUrl}`);
     } else {
-      console.log('🌐 Navegador abierto automáticamente');
+      console.log(`🌐 Navegador abierto automáticamente en ${serverUrl}`);
     }
   });
 }
+
+// 404 para rutas no encontradas (solo HTML/GET)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && req.accepts('html')) {
+    return res.status(404).sendFile(path.join(FRONTEND_DIR, '404.html'));
+  }
+  next();
+});
 
 // -----------------------------
 // Iniciar servidor

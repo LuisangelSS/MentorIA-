@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Configurar el botón de logout
     setupLogoutButton();
     
-    // Configurar el botón de perfil
-    setupProfileButton();
+    // Hacer clickeable la tarjeta de cuenta (usuario/email)
+    setupAccountCardHandler();
 });
 
 async function loadUserInfo() {
@@ -15,12 +15,12 @@ async function loadUserInfo() {
     
     if (!userToken) {
         // Si no hay token, redirigir al login
-        window.location.href = 'login.html';
+        window.location.href = '/login';
         return;
     }
     
     try {
-        const response = await fetch('http://localhost:3000/user-info', {
+const response = await fetch('/user-info', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${userToken}`,
@@ -35,7 +35,7 @@ async function loadUserInfo() {
             // Token inválido o expirado
             console.error('Token inválido o expirado');
             clearUserSession();
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         }
     } catch (error) {
         console.error('Error al obtener información del usuario:', error);
@@ -62,11 +62,16 @@ function setupLogoutButton() {
     }
 }
 
-function setupProfileButton() {
-    const profileBtn = document.getElementById('profile-btn');
-    if (profileBtn) {
-        profileBtn.addEventListener('click', () => {
-            window.location.href = 'profile.html';
+function setupAccountCardHandler() {
+    const card = document.getElementById('account-card');
+    if (card) {
+        const goProfile = () => window.location.href = '/profile';
+        card.addEventListener('click', goProfile);
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                goProfile();
+            }
         });
     }
 }
@@ -77,7 +82,7 @@ async function handleLogout() {
     if (userToken) {
         try {
             // Llamar al endpoint de logout en el servidor
-            await fetch('http://localhost:3000/logout', {
+await fetch('/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -91,7 +96,7 @@ async function handleLogout() {
     
     // Limpiar datos locales y redirigir
     clearUserSession();
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 function clearUserSession() {
@@ -105,14 +110,14 @@ function startTokenValidation() {
         const userToken = localStorage.getItem('userToken');
         if (userToken) {
             try {
-                const response = await fetch('http://localhost:3000/user-info', {
+const response = await fetch('/user-info', {
                     headers: { 'Authorization': `Bearer ${userToken}` }
                 });
                 
                 if (!response.ok) {
                     // Token expirado, hacer logout automático
                     clearUserSession();
-                    window.location.href = 'login.html';
+                    window.location.href = '/login';
                 }
             } catch (error) {
                 console.error('Error verificando token:', error);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="dark" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,28 +7,28 @@
         <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/style.css" />
         <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png" />
-        <script src="../backend/login.js"></script>
+        <script src="js/login.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-        <script src="../backend/assets/particles.js"></script>
+        <script src="assets/particles.js"></script>
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     </head>
-    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-4  flex flex-col justify-center">
+    <body class="bg-background text-text p-4  flex flex-col justify-center">
         
         <div data-aos="fade-up" data-aos-delay="300" class="mx-auto">
-            <a href="index.html"><img src="assets/svg/MentorIA-logo.svg" alt="Logo MentorIA" class="w-30 sm:hidden"></a>
+            <a href="/"><img src="assets/svg/MentorIA-logo.svg" alt="Logo MentorIA" class="w-30 sm:hidden"></a>
         </div>
         <!-- Header -->
-        <header data-aos="fade-up" data-aos-delay="300" class="text-center mt-10 mb-10">
-            <h1 class="text-5xl 2xl:text-8xl text-white font-bold">¡Estás de vuelta!</h1>
-            <p class="text-3xl 2xl:text-5xl mt-2 text-[#8E94E5] font-bold">¿Qué vamos a aprender hoy?</p>
+        <header data-aos="fade-up" data-aos-delay="300" class="text-center mt-5 mb-5">
+            <h1 class="text-5xl 2xl:text-8xl text-text font-bold">¡Estás de vuelta!</h1>
+            <p class="text-3xl 2xl:text-5xl mt-2 text-accent font-bold">¿Qué vamos a aprender hoy?</p>
         </header>
 
         <!-- Contenedor Login + Imagen -->
-        <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col sm:flex-row items-center justify-center gap-12 w-[90%] max-w-6xl mx-auto">
+        <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col sm:flex-row items-center justify-center gap-12 w-[90%]  mx-auto">
             <!-- Formulario -->
-            <div class="w-[22rem] 2xl:w-[26rem] bg-[#0C0C1C] border rounded-2xl p-6 shadow-lg">
-                <h2 class="mb-5 font-black text-3xl text-white">Iniciar sesión</h2>
+            <div class="w-[22rem] 2xl:w-[26rem] bg-background border rounded-2xl p-6 shadow-lg">
+                <h2 class="mb-5 font-black text-3xl text-text">Iniciar sesión</h2>
 
                 <!-- Mensaje de estado -->
                 <div id="message" class="hidden mb-4 p-3 rounded-lg text-center font-bold"></div>
@@ -36,19 +36,19 @@
                 <form id="loginForm" class="flex flex-col">
                     <label class="font-bold mb-2" for="email">
                         Email
-                        <input type="email" name="email" id="email" placeholder="ejemplo@gmail.com" class="mt-1 p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" required />
+                        <input type="email" name="email" id="email" placeholder="ejemplo@gmail.com" class="mt-1 p-3 bg-background rounded-lg border text-text w-full" required />
                     </label>
 
                     <label class="font-bold mb-8" for="password">
                         Contraseña
-                        <input type="password" name="password" id="password" placeholder="Tu contraseña" class="mt-1 p-3 bg-[#0C0C1C] rounded-lg border text-white w-full" required />
+                        <input type="password" name="password" id="password" placeholder="Tu contraseña" class="mt-1 p-3 bg-background rounded-lg border text-text w-full" required />
                     </label>
 
-                    <button type="submit" id="submitBtn" class="hover:cursor-pointer hover:bg-gray-300 p-3 bg-white text-[#0C0C1C] font-black text-xl rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">Iniciar Sesión</button>
+                    <button type="submit" id="submitBtn" class="hover:cursor-pointer hover:bg-gray-300 p-3 bg-white text-background font-black text-xl rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">Iniciar Sesión</button>
                 </form>
 
                 <div class="flex justify-center mt-3">
-                    <a class="text-white" href="registro.html">
+                    <a class="text-text" href="/register">
                         ¿No tienes una cuenta?
                         <span class="font-bold">Crear una.</span>
                     </a>
@@ -57,8 +57,8 @@
 
             <!-- Imagen / Logo -->
             <div class="sm:flex justify-center hidden">
-                <a href="index.html">
-                    <img class="2xl:w-[30rem]  " src="assets/svg/MentorIA-logo.svg" alt="MentorIA logo" />
+                <a href="/">
+                    <img class="w-[300px]  " src="assets/svg/MentorIA-logo.svg" alt="MentorIA logo" />
                 </a>
             </div>
         </div>

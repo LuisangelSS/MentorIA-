@@ -5,6 +5,13 @@ const chatBox = document.getElementById("chat-box");
 const chatTitle = document.getElementById("chat-title");
 const chatLogo = document.getElementById("chat-logo");
 
+function renderMarkdownToHtml(markdownText) {
+  if (!markdownText) return "";
+  const rawHtml = window.marked ? window.marked.parse(markdownText) : markdownText;
+  const sanitizedHtml = window.DOMPurify ? window.DOMPurify.sanitize(rawHtml) : rawHtml;
+  return sanitizedHtml;
+}
+
 button.addEventListener("click", async (e) => {
   e.preventDefault();
   const prompt = input.value.trim();
@@ -16,16 +23,16 @@ button.addEventListener("click", async (e) => {
     chatLogo.style.display = "none";
   }
 
-  // Mostrar prompt en el chat
+  // Mostrar prompt en el chat (sanitizado)
   const userMsg = document.createElement("div");
-  userMsg.className = "animate-fadeIn w-[900px] ml-10 text-end font-bold text-white  p-5 bg-[#2E3050] rounded-lg mb-8 px-4 sm:px-6";
-  userMsg.innerHTML = prompt;
+  userMsg.className = "markdown-content animate-fadeIn w-[800px] ml-10 text-end font-bold text-text  p-5 bg-background rounded-lg mb-8 px-4 sm:px-6";
+  userMsg.innerHTML = renderMarkdownToHtml(prompt);
   chatBox.appendChild(userMsg);
 
   input.value = "";
 
   try {
-    const res = await fetch("http://localhost:3000/chat", {
+const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt })
@@ -34,8 +41,10 @@ button.addEventListener("click", async (e) => {
     const data = await res.json();
 
     const botMsg = document.createElement("div");
-    botMsg.className = "animate-fadeIn w-[900px] mr-10 text-start text-white mb-8 px-4 p-5 bg-[#0C0C1C] rounded-lg sm:px-6 ";
-    botMsg.innerHTML = data.reply;
+    botMsg.className = "markdown-content animate-fadeIn w-[900px] mr-10 text-start text-text mb-8 px-4 p-5 rounded-lg sm:px-6 ";
+    // La API ya devuelve HTML (marked en el backend), pero re-sanitizamos por seguridad
+    const safeBotHtml = window.DOMPurify ? window.DOMPurify.sanitize(data.reply) : data.reply;
+    botMsg.innerHTML = safeBotHtml;
     chatBox.appendChild(botMsg);
 
     // Mantener el scroll al final

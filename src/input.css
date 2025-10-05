@@ -43,3 +43,89 @@
   --color-border-light: rgba(163, 181, 205, 0.2);
 }
 
+/* === Markdown styles dentro del chat === */
+.markdown-content {
+  line-height: 1.75;
+  font-size: 1.1rem;
+}
+
+
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.markdown-content h1 { font-size: 1.6rem; }
+.markdown-content h2 { font-size: 1.3rem; }
+.markdown-content h3 { font-size: 2rem;  }
+.markdown-content h4 { font-size: 1.5rem; }
+.markdown-content p {
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.markdown-content strong { font-weight: 800; }
+.markdown-content em { font-style: italic; }
+
+.markdown-content ul, .markdown-content ol {
+  margin: 0.6rem 0 0.9rem 1.25rem;
+}
+
+.markdown-content li { list-style: disc; }
+.markdown-content ol > li { list-style: decimal; }
+.markdown-content li + li { margin-top: 0.25rem; }
+
+.markdown-content hr {
+  border: 0;
+  height: 1px;
+  background: var(--color-border-light);
+  margin: 1rem 0;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid var(--color-accent);
+  background: rgba(142, 148, 229, 0.08);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  border-radius: 0.25rem;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.markdown-content th, .markdown-content td {
+  border: 1px solid var(--color-border-light);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+}
+
+.markdown-content thead th {
+  background: rgba(142, 148, 229, 0.12);
+}
+
+.markdown-content code {
+  background: var(--color-background);
+  padding: 0.30rem 0.50rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background: var(--color-background);
+  padding: 0.9rem 1rem;
+  border-radius: 0.5rem;
+  overflow: auto;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+}
+

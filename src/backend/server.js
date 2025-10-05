@@ -52,6 +52,10 @@ app.use(bodyParser.json());
 // Servir archivos estáticos desde la carpeta frontend
 app.use(express.static(FRONTEND_DIR));
 
+
+
+
+
 // -----------------------------
 // Rutas para servir páginas HTML
 // -----------------------------
@@ -387,6 +391,14 @@ function openBrowser() {
     }
   });
 }
+
+// 404 para rutas no encontradas (solo HTML/GET)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && req.accepts('html')) {
+    return res.status(404).sendFile(path.join(FRONTEND_DIR, '404.html'));
+  }
+  next();
+});
 
 // -----------------------------
 // Iniciar servidor

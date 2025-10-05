@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="dark" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,38 +10,38 @@
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="assets/particles.js"></script>
     </head>
-    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-2 h-screen">
+    <body class="bg-background text-text p-2 sm:p-2 h-screen">
         <main class="animate-fadeIn">
-            <div class="bg-[#464973] rounded-lg h-14 sm:h-16 lg:h-[7vh] flex items-center px-3 sm:px-4 border border-[#A3B5CD] animate-slideInLeft">
+            <div class="bg-secondary rounded-lg h-14 sm:h-16 lg:h-[7vh] flex items-center px-3 sm:px-4 border border-text animate-slideInLeft">
                 <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="h-full" />
                 <img />
                 <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
             </div>
 
             <div class="flex flex-col lg:flex-row gap-3 sm:gap-5 mt-3 min-h-[calc(100vh-120px)] lg:h-[87vh]">
-                <div class="bg-[#464973] w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2 border border-[#A3B5CD] animate-slideInLeft order-2 lg:order-1">
-                    <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                <div class="bg-secondary w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2 border border-text animate-slideInLeft order-2 lg:order-1">
+                    <a href="#" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-home text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Inicio</p>
                     </a>
-                    <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <a href="dashboard.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-grid text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Dashboard</p>
                     </a>
-                    <a href="#" class="flex rounded-lg bg-[#161B32] w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <a href="quizzes.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-message-question-mark text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Quizzes</p>
                     </a>
 
                     <h3 class="font-bold text-sm sm:text-base mt-2">Configuración de cuenta</h3>
-                    <div class="h-full bg-[#161B32] rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
+                    <div class="h-full bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
                     <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform cursor-pointer">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#464973] rounded-full flex items-center justify-center">
-                            <i class='bx bx-user text-[#A3B5CD] text-lg sm:text-xl'></i>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
+                            <i class='bx bx-user text-text text-lg sm:text-xl'></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p id="user-name" class="text-xs sm:text-sm font-medium text-[#A3B5CD] truncate">Cargando...</p>
-                            <p id="user-email" class="text-xs text-[#8892b0] truncate">Cargando...</p>
+                            <p id="user-name" class="text-xs sm:text-sm font-medium text-text truncate">Cargando...</p>
+                            <p id="user-email" class="text-xs text-text-muted truncate">Cargando...</p>
                         </div>
                     </div>
 
@@ -52,23 +52,23 @@
                     </div>
                 </div>
 
-                <div class="bg-[#161B32] w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 border border-[#A3B5CD] animate-slideInRight order-1 lg:order-2">
+                <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 border border-text animate-slideInRight order-1 lg:order-2">
                     <div class="rounded-xl flex-1 flex flex-col justify-center items-center animate-fadeIn overflow-auto">
                         <div class="">
                             <div id="chat-logo" class="">
-                                <img class="size-40 lg:size-45 text-[#A3B5CD]" src="assets/svg/logo.svg" />
+                                <img class="size-40 lg:size-45 text-text" src="assets/svg/logo.svg" />
                             </div>
                         </div>
-                        <div id="chat-box" class="flex flex-col overflow-y-auto bg-[#161B32] rounded-xl custom-scrollbar items-center"></div>
+                        <div id="chat-box" class="flex flex-col overflow-y-auto bg-background-light rounded-xl custom-scrollbar items-center"></div>
                         <h1 id="chat-title" class="font-bold text-2xl sm:text-2xl lg:text-3xl xl:text-4xl text-center px-4 leading-tight">¿Qué quieres estudiar hoy?</h1>
                     </div>
 
                     <div class="sticky bottom-0 flex justify-center animate-fadeIn">
-                        <div class="w-full max-w-2xl bg-[#464973] rounded-2xl shadow-lg border border-[#A3B5CD]/20">
+                        <div class="w-full max-w-2xl bg-secondary rounded-2xl shadow-lg border border-text/20">
                             <form action="#" method="post" class="flex items-center p-3 sm:p-4">
-                                <input type="text" placeholder="Escribe tu pregunta aquí..." class="flex-1 bg-transparent outline-none text-white placeholder-[#A3B5CD]/70 text-sm sm:text-base px-2" />
-                                <button type="submit" class="ml-3 p-2 bg-[#161B32] rounded-xl hover:bg-[#2e3159] transition-all duration-300 hover:scale-110 transform">
-                                    <i class="bx bxs-send text-xl sm:text-2xl text-[#A3B5CD] hover:text-white transition-colors duration-300"></i>
+                                <input type="text" placeholder="Escribe tu pregunta aquí..." class="flex-1 bg-transparent outline-none text-text placeholder-text/70 text-sm sm:text-base px-2" />
+                                <button type="submit" class="ml-3 p-2 bg-background-light rounded-xl hover:bg-[#2e3159] transition-all duration-300 hover:scale-110 transform">
+                                    <i class="bx bxs-send text-xl sm:text-2xl text-text hover:text-text transition-colors duration-300"></i>
                                 </button>
                             </form>
                         </div>

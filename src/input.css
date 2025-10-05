@@ -1,2 +1,45 @@
 @import "tailwindcss";
 
+/* === LIGHT MODE (por defecto) === */
+@theme {
+  --color-background: #E3E8F3;
+  --color-background-light: #7D84EA;
+  --color-secondary: #D7D9FF;
+  --color-text: #161B32;
+  
+  /* Colores adicionales */
+  --color-primary: #7D84EA;
+  --color-accent: #8E94E5;
+  --color-chat-user: #D7D9FF;
+  --color-chat-bot: #E3E8F3;
+  --color-sidebar: #D7D9FF;
+  --color-header: #D7D9FF;
+  --color-input-bg: #ffffff;
+  --color-border: #7D84EA;
+  --color-border-light: rgba(125, 132, 234, 0.2);
+  
+  /* Colores de estado */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+}
+
+/* === DARK MODE === */
+.dark {
+  --color-background: #0C0C1C;
+  --color-background-light: #161B32;
+  --color-secondary: #464973;
+  --color-text: #ffffff;
+  
+  /* Colores adicionales */
+  --color-primary: #A3B5CD;
+  --color-accent: #8E94E5;
+  --color-chat-user: #2E3050;
+  --color-chat-bot: #0C0C1C;
+  --color-sidebar: #464973;
+  --color-header: #464973;
+  --color-input-bg: #161B32;
+  --color-border: #A3B5CD;
+  --color-border-light: rgba(163, 181, 205, 0.2);
+}
+

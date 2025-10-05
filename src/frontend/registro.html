@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="dark" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,16 +13,16 @@
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     </head>
-    <body class="bg-[#0C0C1C] text-[#A3B5CD] p-2 sm:p-4 min-h-screen flex flex-col items-center">
+    <body class="bg-background text-text p-2 sm:p-4 min-h-screen flex flex-col items-center">
         <!-- Header  -->
         <header class="w-full text-center px-4 mt-1 sm:mt-1">
-            <h1 data-aos="fade-up" data-aos-delay="300" class="text-5xl sm:text-2xl md:text-3xl lg:text-5xl 2xl:text-6xl text-white">
+            <h1 data-aos="fade-up" data-aos-delay="300" class="text-5xl sm:text-2xl md:text-3xl lg:text-5xl 2xl:text-8xl text-text">
                 Estás a
-                <span class="font-bold text-[#8E94E5]">un paso</span>
+                <span class="font-bold text-accent">un paso</span>
                 de
-                <span class="font-bold text-[#8E94E5]">convertirte</span>
+                <span class="font-bold text-accent">convertirte</span>
                 en un
-                <span class="font-bold text-[#8E94E5]">mejor estudiante.</span>
+                <span class="font-bold text-accent">mejor estudiante.</span>
             </h1>
         </header>
 
@@ -34,8 +34,8 @@
                 </a>
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="300" class="w-full max-w-md bg-[#0C0C1C] border-2 border-gray-700 rounded-2xl p-6">
-                <h2 class="font-black text-2xl sm:text-3xl md:text-3xl text-white mb-4">Registrarse</h2>
+            <div data-aos="fade-up" data-aos-delay="300" class="w-full max-w-md bg-background border-2 border-gray-700 rounded-2xl p-6">
+                <h2 class="font-black text-2xl sm:text-3xl md:text-3xl text-text mb-4">Registrarse</h2>
 
                 <!-- Mensaje de estado --> 
                 <div id="message" class="hidden p-3 rounded-lg text-center font-bold"></div>
@@ -43,17 +43,17 @@
                 <form  id="registerForm" class="flex flex-col gap-1">
                     <label class="font-bold" for="username">
                         Nombre de usuario
-                        <input type="text" name="username" id="username" placeholder="Tu nombre de usuario" class="mt-1 sm:p-2 p-2 bg-[#0C0C1C] rounded-lg border border-gray-500 text-white w-full" required />
+                        <input type="text" name="username" id="username" placeholder="Tu nombre de usuario" class="mt-1 sm:p-2 p-2 bg-background rounded-lg border border-gray-500 text-text w-full" required />
                     </label>
 
                     <label class="font-bold" for="email">
                         Email
-                        <input type="email" name="email" id="email" placeholder="ejemplo@gmail.com" class="mt-1 sm:p-2 p-2 bg-[#0C0C1C] rounded-lg border border-gray-500 text-white w-full" required />
+                        <input type="email" name="email" id="email" placeholder="ejemplo@gmail.com" class="mt-1 sm:p-2 p-2 bg-background rounded-lg border border-gray-500 text-text w-full" required />
                     </label>
 
                     <label class="font-bold" for="password">
                         Contraseña
-                        <input type="password" name="password" id="password" placeholder="****************" class="mt-1 sm:p-2 p-2 bg-[#0C0C1C] rounded-lg border border-gray-500 text-white w-full" required minlength="6" />
+                        <input type="password" name="password" id="password" placeholder="****************" class="mt-1 sm:p-2 p-2 bg-background rounded-lg border border-gray-500 text-text w-full" required minlength="6" />
                     </label>
 
                     <div class="flex items-center mt-1 mb-1">
@@ -61,11 +61,11 @@
                         <label for="terms" class="text-sm sm:text-base">Aceptar términos y condiciones.</label>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="mt-2 sm:mt-2 p-1 sm:p-2 bg-white text-[#0C0C1C] font-black text-lg sm:text-xl rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">Crear cuenta</button>
+                    <button type="submit" id="submitBtn" class="mt-2 sm:mt-2 p-1 sm:p-2 bg-white text-background font-black text-lg sm:text-xl rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">Crear cuenta</button>
                 </form>
 
                 <div  class="flex justify-center mt-1 sm:mt-2 text-sm sm:text-base">
-                    <a class="text-white" href="/login">
+                    <a class="text-text" href="/login">
                         ¿Ya tienes una sesión?
                         <span class="font-bold">Clica aquí</span>
                     </a>

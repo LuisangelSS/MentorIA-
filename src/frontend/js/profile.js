@@ -192,8 +192,8 @@ function showMessage(text, type) {
     messageDiv.textContent = text;
     messageDiv.className = `mb-4 p-3 rounded-lg text-center font-bold ${
         type === 'success' 
-            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white border border-green-400' 
-            : 'bg-gradient-to-r from-red-600 to-pink-600 text-white border border-red-400'
+            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-text border border-green-400' 
+            : 'bg-gradient-to-r from-red-600 to-pink-600 text-text border border-red-400'
     }`;
     messageDiv.classList.remove('hidden');
     

@@ -90,7 +90,7 @@ function showMessage(text, type) {
     const messageDiv = document.getElementById('message');
     messageDiv.textContent = text;
     messageDiv.className = `mb-4 p-3 rounded-lg text-center font-bold ${
-        type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        type === 'success' ? 'bg-green-600 text-text' : 'bg-red-600 text-text'
     }`;
     messageDiv.classList.remove('hidden');
     

@@ -500,6 +500,9 @@
   .max-w-\[1200px\] {
     max-width: 1200px;
   }
+  .max-w-\[1300px\] {
+    max-width: 1300px;
+  }
   .max-w-lg {
     max-width: var(--container-lg);
   }

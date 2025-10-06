@@ -160,4 +160,94 @@ export function verifyCurrentPassword(userId, currentPassword) {
     return verifyPassword(currentPassword, user.password_hash);
 }
 
+// ----------------------------
+// TABLAS PARA QUIZZES Y PROGRESO
+// ----------------------------
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS quizzes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    topic TEXT NOT NULL,
+    difficulty TEXT,
+    questions_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    answers_json TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+`);
+
+// ----------------------------
+// FUNCIONES PARA QUIZZES
+// ----------------------------
+
+export function createQuiz(userId, topic, difficulty, questions) {
+    const stmt = db.prepare(`
+        INSERT INTO quizzes (user_id, topic, difficulty, questions_json)
+        VALUES (?, ?, ?, ?)
+    `);
+    const info = stmt.run(userId, topic, difficulty || null, JSON.stringify(questions));
+    return info.lastInsertRowid;
+}
+
+export function getRecentQuizzes(userId, limit = 8) {
+    const stmt = db.prepare(`
+        SELECT id, topic, difficulty, created_at
+        FROM quizzes
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+    `);
+    return stmt.all(userId, limit);
+}
+
+export function getQuizById(quizId, userId) {
+    const stmt = db.prepare(`
+        SELECT id, user_id, topic, difficulty, questions_json, created_at
+        FROM quizzes
+        WHERE id = ? AND user_id = ?
+    `);
+    return stmt.get(quizId, userId);
+}
+
+export function recordQuizAttempt(quizId, userId, answers, score, total) {
+    const stmt = db.prepare(`
+        INSERT INTO quiz_attempts (quiz_id, user_id, answers_json, score, total)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    const info = stmt.run(quizId, userId, JSON.stringify(answers), score, total);
+    return info.lastInsertRowid;
+}
+
+export function getProgressSummary(userId) {
+    const totals = db.prepare(`
+        SELECT
+          (SELECT COUNT(*) FROM quizzes WHERE user_id = ?) AS quizzes_count,
+          (SELECT COUNT(*) FROM quiz_attempts WHERE user_id = ?) AS attempts_count,
+          (SELECT COALESCE(ROUND(AVG(100.0 * score / total), 2), 0) FROM quiz_attempts WHERE user_id = ?) AS avg_score
+    `).get(userId, userId, userId);
+
+    const recentAttempts = db.prepare(`
+        SELECT qa.id, qa.quiz_id, q.topic, qa.score, qa.total, qa.completed_at
+        FROM quiz_attempts qa
+        JOIN quizzes q ON qa.quiz_id = q.id
+        WHERE qa.user_id = ?
+        ORDER BY qa.completed_at DESC
+        LIMIT 10
+    `).all(userId);
+
+    return { ...totals, recentAttempts };
+}
+
 export default db;

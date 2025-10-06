@@ -21,7 +21,12 @@ import {
   updateUsername,
   updateEmail,
   updatePassword,
-  verifyCurrentPassword
+  verifyCurrentPassword,
+  createQuiz,
+  getRecentQuizzes,
+  getQuizById,
+  recordQuizAttempt,
+  getProgressSummary
 } from "./db.js"; // <- db.js está en la misma carpeta que server.js
 
 // -----------------------------
@@ -78,6 +83,16 @@ app.get('/register', (req, res) => {
 // Ruta para la aplicación principal
 app.get('/app', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'app.html'));
+});
+
+// Ruta para quizzes
+app.get('/quizzes', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'quizzes.html'));
+});
+
+// Ruta para dashboard (se creará archivo)
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
 });
 
 // Ruta para el perfil de usuario
@@ -327,7 +342,6 @@ app.put("/profile/update-all", validateToken, (req, res) => {
 
 // -----------------------------
 // Endpoint de chat con Gemini
-// -----------------------------
 app.post("/chat", async (req, res) => {
   const { prompt } = req.body;
 
@@ -361,6 +375,211 @@ app.post("/chat", async (req, res) => {
     console.error("Error al comunicarse con Gemini:", error);
     res.status(500).json({ error: "Error al comunicarse con Gemini" });
   }
+});
+
+// -----------------------------
+// Utilidades para parsear y normalizar JSON de Gemini
+// -----------------------------
+
+function extractJson(text) {
+  if (!text || typeof text !== 'string') return null;
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  let candidate = fenced ? fenced[1] : text;
+  // Recortar al primer {...último}
+  const first = candidate.indexOf('{');
+  const last = candidate.lastIndexOf('}');
+  if (first !== -1 && last !== -1 && last > first) {
+    candidate = candidate.slice(first, last + 1);
+  }
+  return candidate.trim();
+}
+
+function tryParseQuiz(text) {
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed === 'string') {
+      return JSON.parse(parsed);
+    }
+    return parsed;
+  } catch {
+    const extracted = extractJson(text);
+    if (!extracted) return null;
+    try {
+      const parsed2 = JSON.parse(extracted);
+      if (typeof parsed2 === 'string') {
+        return JSON.parse(parsed2);
+      }
+      return parsed2;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function normalizeQuizSchema(quiz, { topic, difficulty }) {
+  const out = { topic: quiz?.topic || topic, difficulty: (quiz?.difficulty || difficulty || '').toString(), questions: [] };
+  const qs = Array.isArray(quiz?.questions) ? quiz.questions : [];
+
+  function makePlaceholder(idx) {
+    const n = idx + 1;
+    return {
+      id: `q${n}`,
+      question: `Pregunta ${n} sobre ${topic}`,
+      options: ["Opción A", "Opción B", "Opción C", "Opción D"],
+      correctIndex: 0,
+      explanation: ""
+    };
+  }
+
+  for (let i = 0; i < qs.length && out.questions.length < 10; i++) {
+    const q = qs[i] || {};
+    let options = Array.isArray(q.options) ? q.options.slice(0, 4) : [];
+    while (options.length < 4) options.push(`Opción ${String.fromCharCode(65 + options.length)}`);
+    let ci = q.correctIndex;
+    if (typeof ci === 'string') ci = parseInt(ci, 10);
+    if (Number.isNaN(ci) || ci < 0 || ci > 3) ci = 0;
+    out.questions.push({
+      id: q.id || `q${out.questions.length + 1}`,
+      question: (q.question || `Pregunta ${out.questions.length + 1} sobre ${topic}`).toString(),
+      options: options.map(o => o.toString()),
+      correctIndex: ci,
+      explanation: (q.explanation || '').toString()
+    });
+  }
+
+  // Asegurar exactamente 10 preguntas
+  while (out.questions.length < 10) {
+    out.questions.push(makePlaceholder(out.questions.length));
+  }
+  if (out.questions.length > 10) out.questions = out.questions.slice(0, 10);
+
+  // Normalizar ids secuenciales
+  out.questions = out.questions.map((q, idx) => ({ ...q, id: `q${idx + 1}` }));
+
+  return out;
+}
+
+// -----------------------------
+// Endpoints de quizzes con Gemini
+// -----------------------------
+
+// Generar un quiz de 10 preguntas con Gemini y guardarlo
+app.post("/quizzes/generate", validateToken, async (req, res) => {
+  const { topic, difficulty } = req.body;
+  const userId = req.user.user_id;
+
+  if (!topic || typeof topic !== 'string' || topic.trim().length < 3) {
+    return res.status(400).json({ error: "Proporciona un tema válido (mín. 3 caracteres)" });
+  }
+
+  const level = (difficulty || 'intermedio').toLowerCase();
+  const allowed = ['básico','basico','intermedio','avanzado','basic','intermediate','advanced'];
+  const normalizedDifficulty = allowed.includes(level) ? level : 'intermedio';
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{
+            text: `Genera un quiz de practica en formato JSON estrictamente valido (sin markdown) sobre el tema: "${topic}".
+- Deben ser exactamente 10 preguntas.
+- Dificultad: ${normalizedDifficulty}.
+- Esquema del JSON:
+{
+  "topic": "string",
+  "difficulty": "basico|intermedio|avanzado",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctIndex": 0,
+      "explanation": "string"
+    }
+  ]
+}
+- Asegurate de que options tenga 4 opciones y correctIndex sea el indice (0-3).
+- No incluyas nada fuera del JSON.`
+          }]
+        }
+      ],
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const raw = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) return res.status(500).json({ error: "Respuesta vacía del modelo" });
+
+    const parsed = tryParseQuiz(raw);
+    if (!parsed) {
+      return res.status(500).json({ error: "No se pudo parsear JSON del modelo" });
+    }
+
+    const normalized = normalizeQuizSchema(parsed, { topic, difficulty: normalizedDifficulty });
+
+    // Guardar en BD con preguntas normalizadas
+    const quizId = createQuiz(userId, normalized.topic, normalizedDifficulty, normalized.questions);
+
+    res.json({ quizId, quiz: { id: quizId, ...normalized } });
+  } catch (error) {
+    console.error("Error generando quiz con Gemini:", error);
+    res.status(500).json({ error: "Error generando el quiz con Gemini" });
+  }
+});
+
+// Listar quizzes recientes del usuario
+app.get("/quizzes/recent", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const items = getRecentQuizzes(userId, 12);
+  res.json({ items });
+});
+
+// Obtener un quiz específico del usuario
+app.get("/quizzes/:id", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const quizId = parseInt(req.params.id, 10);
+  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
+
+  const row = getQuizById(quizId, userId);
+  if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
+
+  let questions;
+  try { questions = JSON.parse(row.questions_json); } catch { questions = []; }
+  res.json({ id: row.id, topic: row.topic, difficulty: row.difficulty, created_at: row.created_at, questions });
+});
+
+// Enviar intento de quiz y calcular puntaje
+app.post("/quizzes/:id/attempt", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const quizId = parseInt(req.params.id, 10);
+  const { answers } = req.body; // array de indices seleccionados
+  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
+  if (!Array.isArray(answers) || answers.length !== 10) {
+    return res.status(400).json({ error: "Debes enviar 10 respuestas" });
+  }
+
+  const row = getQuizById(quizId, userId);
+  if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
+
+  let questions = [];
+  try { questions = JSON.parse(row.questions_json); } catch { /* noop */ }
+
+  const total = questions.length;
+  let score = 0;
+  questions.forEach((q, idx) => {
+    if (typeof q.correctIndex === 'number' && answers[idx] === q.correctIndex) score += 1;
+  });
+
+  const attemptId = recordQuizAttempt(quizId, userId, answers, score, total);
+  res.json({ attemptId, score, total, percentage: Math.round((score/total)*100) });
+});
+
+// Resumen de progreso del usuario (para dashboard)
+app.get("/progress/summary", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const summary = getProgressSummary(userId);
+  res.json(summary);
 });
 
 // -----------------------------

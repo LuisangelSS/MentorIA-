@@ -112,26 +112,6 @@
         </main>
         <script>
             AOS.init();
-
-            const html = document.documentElement;
-            const toggleBtn = document.getElementById("theme-toggle");
-
-            // Al cargar la página, aplicar el tema guardado si existe
-            const savedTheme = localStorage.getItem("theme");
-            if (savedTheme) {
-                html.classList.toggle("dark", savedTheme === "dark");
-            } else {
-                // Si no hay nada guardado, puedes detectar preferencia del sistema
-                if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                    html.classList.add("dark");
-                }
-            }
-
-            // Evento para alternar entre claro y oscuro
-            toggleBtn.addEventListener("click", () => {
-                const isDark = html.classList.toggle("dark"); // alterna y devuelve true si se activó
-                localStorage.setItem("theme", isDark ? "dark" : "light");
-            });
         </script>
     </body>
 </html>

@@ -14,6 +14,9 @@
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
         <script src="js/theme-init.js"></script>
+        <style>
+            .hover-text-accent:hover { color: var(--color-accent); }
+        </style>
     </head>
     <body class="bg-background text-text p-2 sm:p-2 h-screen">
         <main class="animate-fadeIn">
@@ -23,7 +26,7 @@
                     <img />
                     <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
                 </div>
-                <div>
+                <div class="flex items-center gap-2">
                     <button id="theme-toggle" type="button" class=" block font-medium text-text rounded-full  focus:outline-hidden  dark:text-text dark:hover:bg-background">
                         <span class="group inline-flex shrink-0 justify-center items-center size-9">
                             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -31,7 +34,7 @@
                             </svg>
                         </span>
                     </button>
-                    
+                    <button id="logout-btn" type="button" class="px-3 py-2 rounded-lg text-text hover-text-accent hover:bg-secondary transition-all duration-300 focus:outline-hidden" title="Cerrar sesión" aria-label="Cerrar sesión">Cerrar sesión</button>
                 </div>
             </div>
 

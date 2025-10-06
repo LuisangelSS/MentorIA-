@@ -350,4 +350,22 @@ export function getUserChatSessions(userId) {
     return stmt.all(userId);
 }
 
+// Obtener una sesión específica asegurando pertenencia del usuario
+export function getChatSessionById(userId, sessionId) {
+    const stmt = db.prepare(`
+        SELECT id, user_id, session_name, created_at, updated_at
+        FROM chat_sessions
+        WHERE id = ? AND user_id = ?
+    `);
+    return stmt.get(sessionId, userId);
+}
+
+// Actualizar nombre de una sesión de chat
+export function updateChatSessionName(sessionId, newName) {
+    const safeName = (newName || '').toString().trim().slice(0, 80);
+    const stmt = db.prepare(`UPDATE chat_sessions SET session_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+    const info = stmt.run(safeName.length ? safeName : 'Nueva conversación', sessionId);
+    return info.changes > 0;
+}
+
 export default db;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html class="light" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +8,7 @@
         <script src="assets/particles.js"></script>
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script src="js/theme-init.js"></script>
         <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/style.css" />
         <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png">
@@ -20,12 +21,21 @@
                 <h1 class="font-black hidden sm:flex text-2xl">MentorIA</h1>
             </a>
             <nav>
-                <ul class="flex gap-4 sm:gap-6">
+                <ul class="flex gap-4 sm:gap-6 items-center">
                     <li>
                         <a class="p-2 px-6 rounded-lg border border-text text-center hover:bg-[#5b5f80] hover:text-text transition-colors" href="/login">Iniciar sesión</a>
                     </li>
                     <li>
                         <a class="p-2 px-6 rounded-lg border border-text bg-background-light text-center hover:bg-accent hover:text-background-light transition-colors" href="/register">Registrarse</a>
+                    </li>
+                    <li>
+                        <button id="theme-toggle" type="button" class=" block font-medium text-text rounded-full  focus:outline-hidden  dark:text-text dark:hover:bg-background">
+                            <span class="group inline-flex shrink-0 justify-center items-center size-9">
+                                <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                                </svg>
+                            </span>
+                        </button>
                     </li>
                 </ul>
             </nav>

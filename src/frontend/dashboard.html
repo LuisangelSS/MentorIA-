@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - MentorIA</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/theme-init.js"></script>
+  </head>
+  <body class="bg-background text-text p-4 sm:p-4 min-h-screen">
+    <div class="flex flex-col gap-6 max-w-6xl mx-auto">
+      <div class="flex justify-between items-center">
+        <div class="h-14 sm:h-16 lg:h-[7vh] flex items-center sm:px-4">
+          <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="h-full" />
+          <h2 class="text-text font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
+        </div>
+        <div class="flex gap-2">
+          <a class="p-3 rounded-lg bg-secondary text-text font-bold" href="/quizzes">Quizzes</a>
+          <a class="p-3 rounded-lg bg-secondary text-text font-bold" href="/app">Chat</a>
+          <button id="theme-toggle" type="button" class=" block font-medium text-text rounded-full  focus:outline-hidden  dark:text-text dark:hover:bg-background">
+            <span class="group inline-flex shrink-0 justify-center items-center size-9">
+                <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                </svg>
+            </span>
+        </button>
+        </div>
+      </div>
+
+      <h1 class="font-black text-4xl">Dashboard de Progreso</h1>
+
+      <section id="metrics" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-secondary p-4 rounded-lg">
+          <div class="text-text/70">Quizzes generados</div>
+          <div id="m-quizzes" class="text-text font-black text-4xl">0</div>
+        </div>
+        <div class="bg-secondary p-4 rounded-lg">
+          <div class="text-text/70">Intentos realizados</div>
+          <div id="m-attempts" class="text-text font-black text-4xl">0</div>
+        </div>
+        <div class="bg-secondary p-4 rounded-lg">
+          <div class="text-text/70">Promedio</div>
+          <div class="text-text font-black text-4xl"><span id="m-avg">0</span>%</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="font-black text-2xl mb-2">Últimos intentos</h2>
+        <div id="recent-attempts" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </section>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

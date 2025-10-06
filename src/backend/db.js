@@ -39,6 +39,24 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS chat_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    session_name TEXT DEFAULT 'Nueva conversación',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chat_session_id INTEGER NOT NULL,
+    role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
+    content TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(chat_session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+);
 `);
 
 // ----------------------------
@@ -158,6 +176,178 @@ export function verifyCurrentPassword(userId, currentPassword) {
     const user = stmt.get(userId);
     if (!user) return false;
     return verifyPassword(currentPassword, user.password_hash);
+}
+
+// ----------------------------
+// TABLAS PARA QUIZZES Y PROGRESO
+// ----------------------------
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS quizzes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    topic TEXT NOT NULL,
+    difficulty TEXT,
+    questions_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    answers_json TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+`);
+
+// ----------------------------
+// FUNCIONES PARA QUIZZES
+// ----------------------------
+
+export function createQuiz(userId, topic, difficulty, questions) {
+    const stmt = db.prepare(`
+        INSERT INTO quizzes (user_id, topic, difficulty, questions_json)
+        VALUES (?, ?, ?, ?)
+    `);
+    const info = stmt.run(userId, topic, difficulty || null, JSON.stringify(questions));
+    return info.lastInsertRowid;
+}
+
+export function getRecentQuizzes(userId, limit = 8) {
+    const stmt = db.prepare(`
+        SELECT id, topic, difficulty, created_at
+        FROM quizzes
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+    `);
+    return stmt.all(userId, limit);
+}
+
+export function getQuizById(quizId, userId) {
+    const stmt = db.prepare(`
+        SELECT id, user_id, topic, difficulty, questions_json, created_at
+        FROM quizzes
+        WHERE id = ? AND user_id = ?
+    `);
+    return stmt.get(quizId, userId);
+}
+
+export function recordQuizAttempt(quizId, userId, answers, score, total) {
+    const stmt = db.prepare(`
+        INSERT INTO quiz_attempts (quiz_id, user_id, answers_json, score, total)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    const info = stmt.run(quizId, userId, JSON.stringify(answers), score, total);
+    return info.lastInsertRowid;
+}
+
+export function getProgressSummary(userId) {
+    const totals = db.prepare(`
+        SELECT
+          (SELECT COUNT(*) FROM quizzes WHERE user_id = ?) AS quizzes_count,
+          (SELECT COUNT(*) FROM quiz_attempts WHERE user_id = ?) AS attempts_count,
+          (SELECT COALESCE(ROUND(AVG(100.0 * score / total), 2), 0) FROM quiz_attempts WHERE user_id = ?) AS avg_score
+    `).get(userId, userId, userId);
+
+    const recentAttempts = db.prepare(`
+        SELECT qa.id, qa.quiz_id, q.topic, qa.score, qa.total, qa.completed_at
+        FROM quiz_attempts qa
+        JOIN quizzes q ON qa.quiz_id = q.id
+        WHERE qa.user_id = ?
+        ORDER BY qa.completed_at DESC
+        LIMIT 10
+    `).all(userId);
+
+    return { ...totals, recentAttempts };
+}
+
+// ----------------------------
+// FUNCIONES DE CHAT Y CONTEXTO
+// ----------------------------
+
+// Crear nueva sesión de chat
+export function createChatSession(userId, sessionName = 'Nueva conversación') {
+    const stmt = db.prepare(`INSERT INTO chat_sessions (user_id, session_name) VALUES (?, ?)`);
+    const info = stmt.run(userId, sessionName);
+    return info.lastInsertRowid;
+}
+
+// Obtener sesión de chat activa del usuario (la más reciente)
+export function getActiveChatSession(userId) {
+    const stmt = db.prepare(`
+        SELECT id, session_name, created_at, updated_at 
+        FROM chat_sessions 
+        WHERE user_id = ? 
+        ORDER BY updated_at DESC 
+        LIMIT 1
+    `);
+    return stmt.get(userId);
+}
+
+// Crear o obtener sesión de chat activa
+export function getOrCreateActiveChatSession(userId) {
+    let session = getActiveChatSession(userId);
+    if (!session) {
+        const sessionId = createChatSession(userId);
+        session = { id: sessionId, session_name: 'Nueva conversación' };
+    }
+    return session;
+}
+
+// Agregar mensaje a la sesión de chat
+export function addChatMessage(chatSessionId, role, content) {
+    const stmt = db.prepare(`INSERT INTO chat_messages (chat_session_id, role, content) VALUES (?, ?, ?)`);
+    const info = stmt.run(chatSessionId, role, content);
+    
+    // Actualizar timestamp de la sesión
+    const updateStmt = db.prepare(`UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+    updateStmt.run(chatSessionId);
+    
+    return info.lastInsertRowid;
+}
+
+// Obtener historial de mensajes de una sesión (últimos N mensajes)
+export function getChatHistory(chatSessionId, limit = 20) {
+    const stmt = db.prepare(`
+        SELECT role, content, created_at 
+        FROM chat_messages 
+        WHERE chat_session_id = ? 
+        ORDER BY created_at DESC 
+        LIMIT ?
+    `);
+    return stmt.all(chatSessionId, limit).reverse(); // Invertir para orden cronológico
+}
+
+// Obtener historial de mensajes del usuario activo
+export function getUserChatHistory(userId, limit = 20) {
+    const session = getActiveChatSession(userId);
+    if (!session) return [];
+    return getChatHistory(session.id, limit);
+}
+
+// Limpiar historial de una sesión
+export function clearChatHistory(chatSessionId) {
+    const stmt = db.prepare(`DELETE FROM chat_messages WHERE chat_session_id = ?`);
+    return stmt.run(chatSessionId);
+}
+
+// Obtener todas las sesiones de chat del usuario
+export function getUserChatSessions(userId) {
+    const stmt = db.prepare(`
+        SELECT id, session_name, created_at, updated_at,
+               (SELECT COUNT(*) FROM chat_messages WHERE chat_session_id = chat_sessions.id) as message_count
+        FROM chat_sessions 
+        WHERE user_id = ? 
+        ORDER BY updated_at DESC
+    `);
+    return stmt.all(userId);
 }
 
 export default db;

@@ -21,8 +21,16 @@ import {
   updateUsername,
   updateEmail,
   updatePassword,
-  verifyCurrentPassword
-} from "./db.js"; // <- db.js está en la misma carpeta que server.js
+  verifyCurrentPassword,
+  createQuiz,
+  getRecentQuizzes,
+  getQuizById,
+  recordQuizAttempt,
+  getProgressSummary,
+  getOrCreateActiveChatSession, 
+  addChatMessage, 
+  getUserChatHistory
+} from "./db.js";
 
 // -----------------------------
 // Cargar variables de entorno
@@ -38,7 +46,7 @@ const PORT = process.env.PORT || 3000;
 // Rutas absolutas útiles
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const FRONTEND_DIR = path.join(__dirname, '../frontend');
+const FRONTEND_DIR = path.join(__dirname, "../frontend");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
@@ -51,10 +59,6 @@ app.use(bodyParser.json());
 
 // Servir archivos estáticos desde la carpeta frontend
 app.use(express.static(FRONTEND_DIR));
-
-
-
-
 
 // -----------------------------
 // Rutas para servir páginas HTML
@@ -83,6 +87,16 @@ app.get('/app', (req, res) => {
 // Ruta para el perfil de usuario
 app.get('/profile', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
+});
+
+// Ruta para quizzes
+app.get('/quizzes', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'quizzes.html'));
+});
+
+// Ruta para dashboard
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
 });
 
 // -----------------------------
@@ -326,41 +340,321 @@ app.put("/profile/update-all", validateToken, (req, res) => {
 });
 
 // -----------------------------
-// Endpoint de chat con Gemini
+// Endpoint de chat con Gemini (con contexto)
 // -----------------------------
 app.post("/chat", async (req, res) => {
-  const { prompt } = req.body;
+    const { prompt, userId } = req.body;
+
+    if (!prompt) {
+        return res.status(400).json({ error: "Prompt requerido" });
+    }
+
+    try {
+        // Obtener o crear sesión de chat activa
+        let chatSession;
+        if (userId) {
+            chatSession = getOrCreateActiveChatSession(userId);
+        }
+
+        // Obtener historial de conversación (últimos 10 mensajes para mantener contexto)
+        let chatHistory = [];
+        if (chatSession) {
+            chatHistory = getUserChatHistory(userId, 10);
+        }
+
+        // Construir el array de contenidos con el historial
+        const contents = [
+            {
+                role: "model",
+                parts: [
+                    {
+                        text: `
+                                  Eres MentorIA, un asistente de estudio inteligente y adaptable. Tu rol es actuar como un mentor académico profesional, enseñando, guiando, evaluando y ajustando tu forma de explicar según el desempeño, ritmo y comprensión del usuario.
+                                  🧠 Rol y Propósito
+                                  Enseña de manera clara, estructurada y progresiva cualquier tema académico solicitado.
+                                  Evalúa la comprensión del usuario constantemente mediante preguntas estratégicas y análisis de respuestas.
+                                  Adapta dinámicamente la complejidad, el estilo y el ritmo de tus explicaciones en función de su desempeño.
+                                  Ofrece una experiencia personalizada que combine enseñanza, práctica y retroalimentación.
+
+                                  🎯 Adaptación Dinámica
+                                  Si el usuario responde correctamente con confianza, incrementa la complejidad gradualmente, usando vocabulario más técnico, problemas de aplicación y ejemplos avanzados.
+                                  Si responde parcialmente o con dudas, reformula con ejemplos adicionales, analogías sencillas y pasos intermedios.
+                                  Si responde de forma incorrecta o muestra confusión, retrocede un nivel, explica la base de forma simple y visual, y luego vuelve a avanzar.
+                                  Si detectas errores repetidos, identifica la causa raíz (conceptual, terminológica o procedimental) y abórdala directamente.
+
+                                  📝 Estilo de Enseñanza
+                                  Usa un tono claro, paciente, motivador y profesional, evitando tecnicismos innecesarios cuando no corresponden al nivel del usuario.
+                                  Divide explicaciones complejas en bloques cortos y progresivos.
+                                  Refuerza conceptos con ejemplos prácticos, analogías cotidianas y ejercicios guiados.
+                                  Finaliza cada bloque con una comprobación breve de comprensión (pregunta, mini quiz o solicitud de resumen).
+                                  Anima al usuario cuando acierta y ofrece retroalimentación constructiva cuando se equivoca.
+
+                                  🧩 Evaluación Continua
+                                  Realiza un seguimiento interno del nivel de comprensión del usuario según sus respuestas, claridad y tiempo de reacción.
+                                  Ajusta el ritmo (más pausado o ágil), el tipo de explicación (conceptual, práctica, visual, técnica) y recomienda material complementario si es necesario.
+                                  Nunca asumas comprensión completa sin evidencia.
+
+                                  🧰 Capacidades Esperadas
+                                  Explicar temas en diferentes niveles de complejidad.
+                                  Generar ejemplos, ejercicios personalizables, quizzes interactivos y resúmenes.
+                                  Recordar y usar el historial de interacción dentro de la sesión para adaptar la enseñanza.
+                                  Saber cuándo reforzar teoría y cuándo avanzar a la práctica.
+
+                                  🚫 Restricciones
+                                  No inventes información académica incorrecta.
+                                  No uses lenguaje excesivamente coloquial en explicaciones técnicas.
+                                  No avances si el usuario no domina la base previa.
+                                  No ignores señales de confusión; adáptate siempre.
+
+                                  🧭 Ejemplo de Comportamiento Adaptativo
+                                  Usuario: "La aceleración es la distancia entre dos puntos, ¿verdad?"
+                                  MentorIA: "Casi, pero no exactamente. La aceleración no mide distancia, mide cómo cambia la velocidad con el tiempo.
+                                  Imagina que vas en bicicleta y cada segundo pedaleas más fuerte. Tu velocidad aumenta cada segundo — eso es aceleración.
+                                  Vamos a repasarlo con un ejemplo sencillo…"
+              `,
+                    },
+                ],
+            }
+        ];
+
+        // Agregar historial de conversación
+        chatHistory.forEach(msg => {
+            contents.push({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.content }]
+            });
+        });
+
+        // Agregar el mensaje actual
+        contents.push({
+            role: "user",
+            parts: [{ text: prompt }]
+        });
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: contents,
+        });
+
+        const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta";
+        const reply = marked.parse(rawReply);
+
+        // Guardar mensajes en la base de datos si hay sesión activa
+        if (chatSession) {
+            addChatMessage(chatSession.id, 'user', prompt);
+            addChatMessage(chatSession.id, 'assistant', rawReply);
+        }
+
+        res.json({ reply });
+    } catch (error) {
+        console.error("Error al comunicarse con Gemini:", error);
+        res.status(500).json({ error: "Error al comunicarse con Gemini" });
+    }
+});
+
+// -----------------------------
+// Utilidades para parsear y normalizar JSON de Gemini
+// -----------------------------
+
+function extractJson(text) {
+  if (!text || typeof text !== 'string') return null;
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  let candidate = fenced ? fenced[1] : text;
+  // Recortar al primer {...último}
+  const first = candidate.indexOf('{');
+  const last = candidate.lastIndexOf('}');
+  if (first !== -1 && last !== -1 && last > first) {
+    candidate = candidate.slice(first, last + 1);
+  }
+  return candidate.trim();
+}
+
+function tryParseQuiz(text) {
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed === 'string') {
+      return JSON.parse(parsed);
+    }
+    return parsed;
+  } catch {
+    const extracted = extractJson(text);
+    if (!extracted) return null;
+    try {
+      const parsed2 = JSON.parse(extracted);
+      if (typeof parsed2 === 'string') {
+        return JSON.parse(parsed2);
+      }
+      return parsed2;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function normalizeQuizSchema(quiz, { topic, difficulty }) {
+  const out = { topic: quiz?.topic || topic, difficulty: (quiz?.difficulty || difficulty || '').toString(), questions: [] };
+  const qs = Array.isArray(quiz?.questions) ? quiz.questions : [];
+
+  function makePlaceholder(idx) {
+    const n = idx + 1;
+    return {
+      id: `q${n}`,
+      question: `Pregunta ${n} sobre ${topic}`,
+      options: ["Opción A", "Opción B", "Opción C", "Opción D"],
+      correctIndex: 0,
+      explanation: ""
+    };
+  }
+
+  for (let i = 0; i < qs.length && out.questions.length < 10; i++) {
+    const q = qs[i] || {};
+    let options = Array.isArray(q.options) ? q.options.slice(0, 4) : [];
+    while (options.length < 4) options.push(`Opción ${String.fromCharCode(65 + options.length)}`);
+    let ci = q.correctIndex;
+    if (typeof ci === 'string') ci = parseInt(ci, 10);
+    if (Number.isNaN(ci) || ci < 0 || ci > 3) ci = 0;
+    out.questions.push({
+      id: q.id || `q${out.questions.length + 1}`,
+      question: (q.question || `Pregunta ${out.questions.length + 1} sobre ${topic}`).toString(),
+      options: options.map(o => o.toString()),
+      correctIndex: ci,
+      explanation: (q.explanation || '').toString()
+    });
+  }
+
+  // Asegurar exactamente 10 preguntas
+  while (out.questions.length < 10) {
+    out.questions.push(makePlaceholder(out.questions.length));
+  }
+  if (out.questions.length > 10) out.questions = out.questions.slice(0, 10);
+
+  // Normalizar ids secuenciales
+  out.questions = out.questions.map((q, idx) => ({ ...q, id: `q${idx + 1}` }));
+
+  return out;
+}
+
+// -----------------------------
+// Endpoints de quizzes con Gemini
+// -----------------------------
+
+// Generar un quiz de 10 preguntas con Gemini y guardarlo
+app.post("/quizzes/generate", validateToken, async (req, res) => {
+  const { topic, difficulty } = req.body;
+  const userId = req.user.user_id;
+
+  if (!topic || typeof topic !== 'string' || topic.trim().length < 3) {
+    return res.status(400).json({ error: "Proporciona un tema válido (mín. 3 caracteres)" });
+  }
+
+  const level = (difficulty || 'intermedio').toLowerCase();
+  const allowed = ['básico','basico','intermedio','avanzado','basic','intermediate','advanced'];
+  const normalizedDifficulty = allowed.includes(level) ? level : 'intermedio';
 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
-        { 
-          role: "model", 
-          parts: [
-            {
-              text: `
-                Eres una IA educativa llamada MentorIA. Tu objetivo es ayudar a los usuarios
-                a aprender sobre temas que no conocen o quieren entender. 
-                Siempre que un usuario quiera aprender algo, antes de explicar, debes preguntar
-                primero qué nivel de dificultad desea que se lo expliques: básico, intermedio o avanzado.
-              `
-            }
-          ]
-        },
-        { role: "user", parts: [{ text: prompt }] }
-      ]
+        {
+          role: "user",
+          parts: [{
+            text: `Genera un quiz de practica en formato JSON estrictamente valido (sin markdown) sobre el tema: "${topic}".
+- Deben ser exactamente 10 preguntas.
+- Dificultad: ${normalizedDifficulty}.
+- Esquema del JSON:
+{
+  "topic": "string",
+  "difficulty": "basico|intermedio|avanzado",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctIndex": 0,
+      "explanation": "string"
+    }
+  ]
+}
+- Asegurate de que options tenga 4 opciones y correctIndex sea el indice (0-3).
+- No incluyas nada fuera del JSON.`
+          }]
+        }
+      ],
+      generationConfig: { responseMimeType: "application/json" }
     });
 
-    const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                     "No se pudo generar respuesta";
-    const reply = marked.parse(rawReply);
-    res.json({ reply });
+    const raw = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) return res.status(500).json({ error: "Respuesta vacía del modelo" });
 
+    const parsed = tryParseQuiz(raw);
+    if (!parsed) {
+      return res.status(500).json({ error: "No se pudo parsear JSON del modelo" });
+    }
+
+    const normalized = normalizeQuizSchema(parsed, { topic, difficulty: normalizedDifficulty });
+
+    // Guardar en BD con preguntas normalizadas
+    const quizId = createQuiz(userId, normalized.topic, normalizedDifficulty, normalized.questions);
+
+    res.json({ quizId, quiz: { id: quizId, ...normalized } });
   } catch (error) {
-    console.error("Error al comunicarse con Gemini:", error);
-    res.status(500).json({ error: "Error al comunicarse con Gemini" });
+    console.error("Error generando quiz con Gemini:", error);
+    res.status(500).json({ error: "Error generando el quiz con Gemini" });
   }
+});
+
+// Listar quizzes recientes del usuario
+app.get("/quizzes/recent", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const items = getRecentQuizzes(userId, 12);
+  res.json({ items });
+});
+
+// Obtener un quiz específico del usuario
+app.get("/quizzes/:id", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const quizId = parseInt(req.params.id, 10);
+  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
+
+  const row = getQuizById(quizId, userId);
+  if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
+
+  let questions;
+  try { questions = JSON.parse(row.questions_json); } catch { questions = []; }
+  res.json({ id: row.id, topic: row.topic, difficulty: row.difficulty, created_at: row.created_at, questions });
+});
+
+// Enviar intento de quiz y calcular puntaje
+app.post("/quizzes/:id/attempt", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const quizId = parseInt(req.params.id, 10);
+  const { answers } = req.body; // array de indices seleccionados
+  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
+  if (!Array.isArray(answers) || answers.length !== 10) {
+    return res.status(400).json({ error: "Debes enviar 10 respuestas" });
+  }
+
+  const row = getQuizById(quizId, userId);
+  if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
+
+  let questions = [];
+  try { questions = JSON.parse(row.questions_json); } catch { /* noop */ }
+
+  const total = questions.length;
+  let score = 0;
+  questions.forEach((q, idx) => {
+    if (typeof q.correctIndex === 'number' && answers[idx] === q.correctIndex) score += 1;
+  });
+
+  const attemptId = recordQuizAttempt(quizId, userId, answers, score, total);
+  res.json({ attemptId, score, total, percentage: Math.round((score/total)*100) });
+});
+
+// Resumen de progreso del usuario (para dashboard)
+app.get("/progress/summary", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const summary = getProgressSummary(userId);
+  res.json(summary);
 });
 
 // -----------------------------
@@ -398,6 +692,11 @@ app.use((req, res, next) => {
     return res.status(404).sendFile(path.join(FRONTEND_DIR, '404.html'));
   }
   next();
+});
+
+// 404 genérico para otros tipos (JSON/text)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Recurso no encontrado' });
 });
 
 // -----------------------------

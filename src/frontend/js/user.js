@@ -31,6 +31,8 @@ const response = await fetch('/user-info', {
         if (response.ok) {
             const userData = await response.json();
             updateUserDisplay(userData);
+            // Guardar userId para el contexto de chat
+            localStorage.setItem('userId', userData.id);
         } else {
             // Token inválido o expirado
             console.error('Token inválido o expirado');
@@ -102,6 +104,7 @@ await fetch('/logout', {
 function clearUserSession() {
     localStorage.removeItem('userToken');
     localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('userId');
 }
 
 // Función para verificar periódicamente si el token sigue siendo válido

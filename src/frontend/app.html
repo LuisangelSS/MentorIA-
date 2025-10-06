@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html class="light" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,69 +9,87 @@
         <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png" />
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="assets/particles.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+        <script src="js/theme-init.js"></script>
     </head>
     <body class="bg-background text-text p-2 sm:p-2 h-screen">
         <main class="animate-fadeIn">
-            <div class="bg-secondary rounded-lg flex justify-between items-center px-3 sm:px-4  animate-slideInLeft">
+            <div class="bg-secondary rounded-lg flex justify-between items-center px-3 sm:px-4 animate-slideInLeft">
                 <div class="h-14 sm:h-16 lg:h-[7vh] flex items-center">
-                    <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="h-full" />
+                    <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="chat-logo h-full" />
                     <img />
                     <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
                 </div>
                 <div>
-                    <button id="toggleMode" class="rounded-full bg-background-light p-2">
-                        <i class="bx bx-highlights"></i>
+                    <button id="theme-toggle" type="button" class=" block font-medium text-text rounded-full  focus:outline-hidden  dark:text-text dark:hover:bg-background">
+                        <span class="group inline-flex shrink-0 justify-center items-center size-9">
+                            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                            </svg>
+                        </span>
                     </button>
+                    
                 </div>
             </div>
 
             <div class="flex flex-col lg:flex-row gap-3 sm:gap-5 mt-3 min-h-[calc(100vh-120px)] lg:h-[87vh]">
-                <div class="bg-secondary w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2  animate-slideInLeft order-2 lg:order-1">
-                    <a href="#" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                <div class="bg-secondary w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2 animate-slideInLeft order-2 lg:order-1">
+                    <a href="index.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-secondary transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-home text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Inicio</p>
                     </a>
-                    <a href="dashboard.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <a href="dashboard.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-secondary transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-grid text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Dashboard</p>
                     </a>
-                    <a href="quizzes.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
+                    <a href="quizzes.html" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-secondary transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-message-question-mark text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Quizzes</p>
                     </a>
 
-                    <h3 class="font-bold text-sm sm:text-base mt-2">Configuración de cuenta</h3>
-                    <div class="h-full bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
-                        <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-[#2e3159] rounded-lg hover:bg-[#3a4066] transition-all duration-300 hover:scale-105 transform cursor-pointer">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
-                                <i class="bx bx-user text-text text-lg sm:text-xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p id="user-name" class="text-xs sm:text-sm font-medium text-text truncate">Cargando...</p>
-                                <p id="user-email" class="text-xs text-text-muted truncate">Cargando...</p>
-                            </div>
+                    <h3 class="font-bold text-sm sm:text-base mt-1">Historial de estudio</h3>
+                    <div class="h-10 bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar flex-1 min-h-0">
+                        <ul class="flex flex-col gap-2 overflow-auto custom-scrollbar">
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Primera guerra mundial</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Curso de Docker</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Teoria del multiverso</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
+                            </a>
+                            
+                        </ul>
+                    </div>
+                    <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-background-light rounded-lg transition-all duration-300 hover:scale-105 transform cursor-pointer">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
+                            <i class="bx bx-user text-text text-lg sm:text-xl"></i>
                         </div>
-
-                        <button id="logout-btn" class="flex items-center gap-3 p-3 bg-red-900/30 rounded-lg hover:bg-red-800/40 transition-all duration-300 hover:scale-105 transform w-full text-left mt-auto">
-                            <i class="bx bx-log-out text-lg sm:text-xl text-red-400"></i>
-                            <span class="text-xs sm:text-sm text-red-400">Cerrar sesión</span>
-                        </button>
+                        <div class="flex-1 min-w-0">
+                            <p id="user-name" class="text-xs sm:text-sm font-medium text-text truncate">Cargando...</p>
+                            <p id="user-email" class="text-xs text-text-muted truncate">Cargando...</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5  animate-slideInRight order-1 lg:order-2">
+                <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 animate-slideInRight order-1 lg:order-2">
                     <div class="rounded-xl flex-1 flex flex-col justify-center items-center animate-fadeIn overflow-auto">
                         <div class="">
-                            <div id="chat-logo" class="">
-                                <img class="size-40 lg:size-45 text-text" src="assets/svg/logo.svg" />
+                            <div class="">
+                                <img id="chat-logo" class="size-40 lg:size-45" src="assets/svg/logo.svg" />
                             </div>
                         </div>
-                        <div id="chat-box" class="flex flex-col overflow-y-auto bg-background-light rounded-xl custom-scrollbar items-center"></div>
+                        <div id="chat-box" class="flex flex-col overflow-y-auto  rounded-xl custom-scrollbar items-center"></div>
                         <h1 id="chat-title" class="font-bold text-2xl sm:text-2xl lg:text-3xl xl:text-4xl text-center px-4 leading-tight">¿Qué quieres estudiar hoy?</h1>
                     </div>
 
@@ -79,7 +97,7 @@
                         <div class="w-full max-w-2xl bg-secondary rounded-2xl shadow-lg /20">
                             <form action="#" method="post" class="flex items-center p-3 sm:p-4">
                                 <input type="text" placeholder="Escribe tu pregunta aquí..." class="flex-1 bg-transparent outline-none text-text placeholder-text/70 text-sm sm:text-base px-2" />
-                                <button type="submit" class="ml-3 p-2 bg-background-light rounded-xl hover:bg-[#2e3159] transition-all duration-300 hover:scale-110 transform">
+                                <button type="submit" class="ml-3 p-2 bg-background-light rounded-xl hover:bg-secondary transition-all duration-300 hover:scale-110 transform">
                                     <i class="bx bxs-send text-xl sm:text-2xl text-text hover:text-text transition-colors duration-300"></i>
                                 </button>
                             </form>
@@ -93,13 +111,6 @@
         </main>
         <script>
             AOS.init();
-
-            const toggleMode = document.querySelector("#toggleMode");
-            const html = document.querySelector("html");
-
-            toggleMode.addEventListener("click", () => {
-                html.classList.toggle("dark");
-            });
         </script>
     </body>
 </html>

@@ -32,10 +32,13 @@ button.addEventListener("click", async (e) => {
   input.value = "";
 
   try {
-const res = await fetch("/chat", {
+    // Obtener userId del localStorage si está disponible
+    const userId = localStorage.getItem('userId');
+    
+    const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ prompt, userId })
     });
 
     const data = await res.json();

@@ -175,3 +175,11 @@ button {
   border: 1px solid var(--color-border-light);
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-light);
+  border-radius: 10px;
+}

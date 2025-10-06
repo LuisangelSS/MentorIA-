@@ -50,22 +50,35 @@
                         <p class="text-sm sm:text-base">Quizzes</p>
                     </a>
 
-                    <h3 class="font-bold text-sm sm:text-base mt-2">Configuración de cuenta</h3>
-                    <div class="h-full bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar">
-                        <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-secondary rounded-lg transition-all duration-300 hover:scale-105 transform cursor-pointer">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
-                                <i class="bx bx-user text-text text-lg sm:text-xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p id="user-name" class="text-xs sm:text-sm font-medium text-text truncate">Cargando...</p>
-                                <p id="user-email" class="text-xs text-text-muted truncate">Cargando...</p>
-                            </div>
+                    <h3 class="font-bold text-sm sm:text-base mt-1">Historial de estudio</h3>
+                    <div class="h-10 bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar flex-1 min-h-0">
+                        <ul class="flex flex-col gap-2 overflow-auto custom-scrollbar">
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Primera guerra mundial</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Curso de Docker</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Teoria del multiverso</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
+                            </a>
+                            <a href="#">
+                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
+                            </a>
+                            
+                        </ul>
+                    </div>
+                    <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-background-light rounded-lg transition-all duration-300 hover:scale-105 transform cursor-pointer">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
+                            <i class="bx bx-user text-text text-lg sm:text-xl"></i>
                         </div>
-
-                        <button id="logout-btn" class="flex items-center gap-3 p-3 bg-red-900/30 dark:bg-red-700/50 rounded-lg hover:cursor-pointer transition-all duration-300 hover:scale-105 transform w-full text-left mt-auto">
-                            <i class="bx bx-log-out text-lg sm:text-xl text-red-400"></i>
-                            <span class="text-xs sm:text-sm text-red-400 dark:text-red-100 ">Cerrar sesión</span>
-                        </button>
+                        <div class="flex-1 min-w-0">
+                            <p id="user-name" class="text-xs sm:text-sm font-medium text-text truncate">Cargando...</p>
+                            <p id="user-email" class="text-xs text-text-muted truncate">Cargando...</p>
+                        </div>
                     </div>
                 </div>
 

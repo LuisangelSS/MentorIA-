@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html class="light" lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,7 +19,7 @@
                     <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 animate-pulse-gentle" />
                     <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA - Perfil</h2>
                 </div>
-                <button onclick="goBack()" class="flex items-center gap-2 p-2 bg-background-light rounded-lg hover:bg-[#2e3159] transition-all duration-300">
+                <button onclick="goBack()" class="flex items-center gap-2 p-2 bg-background-light rounded-lg hover:bg-secondary transition-all duration-300">
                     <i class="bx bx-arrow-back text-lg"></i>
                     <span class="hidden sm:inline text-sm">Volver</span>
                 </button>
@@ -39,11 +39,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-text">Nombre de usuario actual</label>
-                                <p id="current-username" class="text-text bg-[#2e3159] p-2 rounded font-medium">Cargando...</p>
+                                <p id="current-username" class="text-text bg-secondary p-2 rounded font-medium">Cargando...</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-text">Correo electrónico actual</label>
-                                <p id="current-email" class="text-text bg-[#2e3159] p-2 rounded font-medium">Cargando...</p>
+                                <p id="current-email" class="text-text bg-secondary p-2 rounded font-medium">Cargando...</p>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                                     <i class="bx bx-user mr-2"></i>
                                     Nuevo nombre de usuario (opcional)
                                 </label>
-                                <input type="text" id="newUsername" name="newUsername" class="w-full p-3 bg-[#2e3159] border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Dejar vacío si no quiere cambiar" minlength="3" />
+                                <input type="text" id="newUsername" name="newUsername" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Dejar vacío si no quiere cambiar" minlength="3" />
                                 <p class="text-xs text-text-muted mt-1">Mínimo 3 caracteres</p>
                             </div>
 
@@ -72,7 +72,7 @@
                                     <i class="bx bx-envelope mr-2"></i>
                                     Nuevo correo electrónico (opcional)
                                 </label>
-                                <input type="email" id="newEmail" name="newEmail" class="w-full p-3 bg-[#2e3159] border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Dejar vacío si no quiere cambiar" />
+                                <input type="email" id="newEmail" name="newEmail" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Dejar vacío si no quiere cambiar" />
                             </div>
 
                             <!-- Divider -->
@@ -88,15 +88,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label for="currentPassword" class="block text-sm font-medium mb-2 text-text">Contraseña actual</label>
-                                    <input type="password" id="currentPassword" name="currentPassword" class="w-full p-3 bg-[#2e3159] border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Solo si cambia contraseña" />
+                                    <input type="password" id="currentPassword" name="currentPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Solo si cambia contraseña" />
                                 </div>
                                 <div>
                                     <label for="newPassword" class="block text-sm font-medium mb-2 text-text">Nueva contraseña</label>
-                                    <input type="password" id="newPassword" name="newPassword" class="w-full p-3 bg-[#2e3159] border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Mínimo 6 caracteres" minlength="6" />
+                                    <input type="password" id="newPassword" name="newPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Mínimo 6 caracteres" minlength="6" />
                                 </div>
                                 <div>
                                     <label for="confirmPassword" class="block text-sm font-medium mb-2 text-text">Confirmar contraseña</label>
-                                    <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-3 bg-[#2e3159] border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Repetir nueva contraseña" minlength="6" />
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Repetir nueva contraseña" minlength="6" />
                                 </div>
                             </div>
 

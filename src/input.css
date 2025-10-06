@@ -1,27 +1,28 @@
 @import "tailwindcss";
 
-/* === LIGHT MODE (por defecto) === */
+/* === LIGHT MODE (contraste mejorado) === */
 @theme {
-  --color-background: #E3E8F3;
-  --color-background-light: #7D84EA;
-  --color-secondary: #D7D9FF;
-  --color-text: #161B32;
+  --color-background: #FFFFFF;
+  --color-background-light: #F1F5F9;
+  --color-secondary: #E2E8F0;
+  --color-text: #0F172A;
   
   /* Colores adicionales */
-  --color-primary: #7D84EA;
-  --color-accent: #8E94E5;
-  --color-chat-user: #D7D9FF;
-  --color-chat-bot: #E3E8F3;
-  --color-sidebar: #D7D9FF;
-  --color-header: #D7D9FF;
-  --color-input-bg: #ffffff;
-  --color-border: #7D84EA;
-  --color-border-light: rgba(125, 132, 234, 0.2);
+  --color-primary: #2563EB;
+  --color-accent: #4F46E5;
+  --color-chat-user: #F1F5F9;
+  --color-chat-bot: #FFFFFF;
+  --color-sidebar: #E2E8F0;
+  --color-header: #E2E8F0;
+  --color-input-bg: #FFFFFF;
+  --color-border: #94A3B8;
+  --color-border-light: rgba(148, 163, 184, 0.4);
+  --color-text-muted: #475569;
   
   /* Colores de estado */
-  --color-success: #10b981;
-  --color-error: #ef4444;
-  --color-warning: #f59e0b;
+  --color-success: #059669;
+  --color-error: #DC2626;
+  --color-warning: #D97706;
 }
 
 /* === DARK MODE === */
@@ -41,6 +42,7 @@
   --color-input-bg: #161B32;
   --color-border: #A3B5CD;
   --color-border-light: rgba(163, 181, 205, 0.2);
+  --color-text-muted: #94A3B8;
 }
 
 /* === Markdown styles dentro del chat === */
@@ -48,8 +50,6 @@
   line-height: 1.75;
   font-size: 1.1rem;
 }
-
-
 
 .markdown-content h1, .markdown-content h2, .markdown-content h3 {
   margin-top: 1rem;
@@ -87,7 +87,7 @@
 
 .markdown-content blockquote {
   border-left: 4px solid var(--color-accent);
-  background: rgba(142, 148, 229, 0.08);
+  background: rgba(79, 70, 229, 0.08);
   padding: 0.75rem 1rem;
   margin: 0.75rem 0;
   border-radius: 0.25rem;
@@ -106,7 +106,7 @@
 }
 
 .markdown-content thead th {
-  background: rgba(142, 148, 229, 0.12);
+  background: rgba(79, 70, 229, 0.12);
 }
 
 .markdown-content code {
@@ -127,5 +127,51 @@
 .markdown-content pre code {
   background: transparent;
   padding: 0;
+}
+
+/* === Mejoras específicas para Light Mode === */
+:root {
+  /* Hover states mejorados para light mode */
+  --hover-bg-light: rgba(37, 99, 235, 0.1);
+  --hover-bg-secondary: rgba(148, 163, 184, 0.2);
+}
+
+/* Mejorar contraste en sidebar para light mode */
+.bg-secondary {
+  border: 1px solid var(--color-border-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+/* Mejorar contraste de texto muted */
+.text-text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Transiciones suaves para cambio de tema */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+
+/* Botones con mejor contraste */
+button {
+  transition: all 0.2s ease;
+}
+
+
+
+/* Sombras sutiles para profundidad */
+.bg-background-light {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejorar contraste en dark mode también */
+.dark .bg-secondary {
+  border: 1px solid var(--color-border-light);
 }
 

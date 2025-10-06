@@ -26,8 +26,11 @@ import {
   getRecentQuizzes,
   getQuizById,
   recordQuizAttempt,
-  getProgressSummary
-} from "./db.js"; // <- db.js está en la misma carpeta que server.js
+  getProgressSummary,
+  getOrCreateActiveChatSession, 
+  addChatMessage, 
+  getUserChatHistory
+} from "./db.js";
 
 // -----------------------------
 // Cargar variables de entorno
@@ -43,7 +46,7 @@ const PORT = process.env.PORT || 3000;
 // Rutas absolutas útiles
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const FRONTEND_DIR = path.join(__dirname, '../frontend');
+const FRONTEND_DIR = path.join(__dirname, "../frontend");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
@@ -56,10 +59,6 @@ app.use(bodyParser.json());
 
 // Servir archivos estáticos desde la carpeta frontend
 app.use(express.static(FRONTEND_DIR));
-
-
-
-
 
 // -----------------------------
 // Rutas para servir páginas HTML
@@ -85,19 +84,19 @@ app.get('/app', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'app.html'));
 });
 
+// Ruta para el perfil de usuario
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
+});
+
 // Ruta para quizzes
 app.get('/quizzes', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'quizzes.html'));
 });
 
-// Ruta para dashboard (se creará archivo)
+// Ruta para dashboard
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
-});
-
-// Ruta para el perfil de usuario
-app.get('/profile', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
 });
 
 // -----------------------------
@@ -341,40 +340,116 @@ app.put("/profile/update-all", validateToken, (req, res) => {
 });
 
 // -----------------------------
-// Endpoint de chat con Gemini
+// Endpoint de chat con Gemini (con contexto)
+// -----------------------------
 app.post("/chat", async (req, res) => {
-  const { prompt } = req.body;
+    const { prompt, userId } = req.body;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        { 
-          role: "model", 
-          parts: [
+    if (!prompt) {
+        return res.status(400).json({ error: "Prompt requerido" });
+    }
+
+    try {
+        // Obtener o crear sesión de chat activa
+        let chatSession;
+        if (userId) {
+            chatSession = getOrCreateActiveChatSession(userId);
+        }
+
+        // Obtener historial de conversación (últimos 10 mensajes para mantener contexto)
+        let chatHistory = [];
+        if (chatSession) {
+            chatHistory = getUserChatHistory(userId, 10);
+        }
+
+        // Construir el array de contenidos con el historial
+        const contents = [
             {
-              text: `
-                Eres una IA educativa llamada MentorIA. Tu objetivo es ayudar a los usuarios
-                a aprender sobre temas que no conocen o quieren entender. 
-                Siempre que un usuario quiera aprender algo, antes de explicar, debes preguntar
-                primero qué nivel de dificultad desea que se lo expliques: básico, intermedio o avanzado.
-              `
+                role: "model",
+                parts: [
+                    {
+                        text: `
+                                  Eres MentorIA, un asistente de estudio inteligente y adaptable. Tu rol es actuar como un mentor académico profesional, enseñando, guiando, evaluando y ajustando tu forma de explicar según el desempeño, ritmo y comprensión del usuario.
+                                  🧠 Rol y Propósito
+                                  Enseña de manera clara, estructurada y progresiva cualquier tema académico solicitado.
+                                  Evalúa la comprensión del usuario constantemente mediante preguntas estratégicas y análisis de respuestas.
+                                  Adapta dinámicamente la complejidad, el estilo y el ritmo de tus explicaciones en función de su desempeño.
+                                  Ofrece una experiencia personalizada que combine enseñanza, práctica y retroalimentación.
+
+                                  🎯 Adaptación Dinámica
+                                  Si el usuario responde correctamente con confianza, incrementa la complejidad gradualmente, usando vocabulario más técnico, problemas de aplicación y ejemplos avanzados.
+                                  Si responde parcialmente o con dudas, reformula con ejemplos adicionales, analogías sencillas y pasos intermedios.
+                                  Si responde de forma incorrecta o muestra confusión, retrocede un nivel, explica la base de forma simple y visual, y luego vuelve a avanzar.
+                                  Si detectas errores repetidos, identifica la causa raíz (conceptual, terminológica o procedimental) y abórdala directamente.
+
+                                  📝 Estilo de Enseñanza
+                                  Usa un tono claro, paciente, motivador y profesional, evitando tecnicismos innecesarios cuando no corresponden al nivel del usuario.
+                                  Divide explicaciones complejas en bloques cortos y progresivos.
+                                  Refuerza conceptos con ejemplos prácticos, analogías cotidianas y ejercicios guiados.
+                                  Finaliza cada bloque con una comprobación breve de comprensión (pregunta, mini quiz o solicitud de resumen).
+                                  Anima al usuario cuando acierta y ofrece retroalimentación constructiva cuando se equivoca.
+
+                                  🧩 Evaluación Continua
+                                  Realiza un seguimiento interno del nivel de comprensión del usuario según sus respuestas, claridad y tiempo de reacción.
+                                  Ajusta el ritmo (más pausado o ágil), el tipo de explicación (conceptual, práctica, visual, técnica) y recomienda material complementario si es necesario.
+                                  Nunca asumas comprensión completa sin evidencia.
+
+                                  🧰 Capacidades Esperadas
+                                  Explicar temas en diferentes niveles de complejidad.
+                                  Generar ejemplos, ejercicios personalizables, quizzes interactivos y resúmenes.
+                                  Recordar y usar el historial de interacción dentro de la sesión para adaptar la enseñanza.
+                                  Saber cuándo reforzar teoría y cuándo avanzar a la práctica.
+
+                                  🚫 Restricciones
+                                  No inventes información académica incorrecta.
+                                  No uses lenguaje excesivamente coloquial en explicaciones técnicas.
+                                  No avances si el usuario no domina la base previa.
+                                  No ignores señales de confusión; adáptate siempre.
+
+                                  🧭 Ejemplo de Comportamiento Adaptativo
+                                  Usuario: "La aceleración es la distancia entre dos puntos, ¿verdad?"
+                                  MentorIA: "Casi, pero no exactamente. La aceleración no mide distancia, mide cómo cambia la velocidad con el tiempo.
+                                  Imagina que vas en bicicleta y cada segundo pedaleas más fuerte. Tu velocidad aumenta cada segundo — eso es aceleración.
+                                  Vamos a repasarlo con un ejemplo sencillo…"
+              `,
+                    },
+                ],
             }
-          ]
-        },
-        { role: "user", parts: [{ text: prompt }] }
-      ]
-    });
+        ];
 
-    const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                     "No se pudo generar respuesta";
-    const reply = marked.parse(rawReply);
-    res.json({ reply });
+        // Agregar historial de conversación
+        chatHistory.forEach(msg => {
+            contents.push({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.content }]
+            });
+        });
 
-  } catch (error) {
-    console.error("Error al comunicarse con Gemini:", error);
-    res.status(500).json({ error: "Error al comunicarse con Gemini" });
-  }
+        // Agregar el mensaje actual
+        contents.push({
+            role: "user",
+            parts: [{ text: prompt }]
+        });
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: contents,
+        });
+
+        const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta";
+        const reply = marked.parse(rawReply);
+
+        // Guardar mensajes en la base de datos si hay sesión activa
+        if (chatSession) {
+            addChatMessage(chatSession.id, 'user', prompt);
+            addChatMessage(chatSession.id, 'assistant', rawReply);
+        }
+
+        res.json({ reply });
+    } catch (error) {
+        console.error("Error al comunicarse con Gemini:", error);
+        res.status(500).json({ error: "Error al comunicarse con Gemini" });
+    }
 });
 
 // -----------------------------
@@ -617,6 +692,11 @@ app.use((req, res, next) => {
     return res.status(404).sendFile(path.join(FRONTEND_DIR, '404.html'));
   }
   next();
+});
+
+// 404 genérico para otros tipos (JSON/text)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Recurso no encontrado' });
 });
 
 // -----------------------------

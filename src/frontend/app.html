@@ -9,29 +9,48 @@
         <link rel="shortcut icon" href="assets/svg/logo.svg" type="image/x-png" />
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="assets/particles.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+        <script src="js/theme-init.js"></script>
     </head>
     <body class="bg-background text-text p-2 sm:p-2 h-screen">
         <main class="animate-fadeIn">
-            <div class="bg-secondary rounded-lg flex justify-between items-center px-3 sm:px-4  animate-slideInLeft">
+            <div class="bg-secondary rounded-lg flex justify-between items-center px-3 sm:px-4 animate-slideInLeft">
                 <div class="h-14 sm:h-16 lg:h-[7vh] flex items-center">
                     <img src="assets/svg/logo.svg" alt="Logo de MentorIA" class="h-full" />
                     <img />
                     <h2 class="font-black text-lg sm:text-xl lg:text-2xl ml-2 sm:ml-3">MentorIA</h2>
                 </div>
                 <div>
-                    <button id="toggleMode" class="rounded-full bg-background-light p-2">
-                        <i class="bx bx-highlights"></i>
+                    <button id="theme-toggle" type="button" class=" block font-medium text-text rounded-full  focus:outline-hidden  dark:text-text dark:hover:bg-background">
+                        <span class="group inline-flex shrink-0 justify-center items-center size-9">
+                            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                    <button type="button" class="hs-dark-mode-active:block hidden hs-dark-mode font-medium text-gray-800 rounded-full hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 dark:text-neutral-200 dark:hover:bg-background">
+                        <span class="group inline-flex shrink-0 justify-center items-center size-9">
+                            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <path d="M12 2v2"></path>
+                                <path d="M12 20v2"></path>
+                                <path d="m4.93 4.93 1.41 1.41"></path>
+                                <path d="m17.66 17.66 1.41 1.41"></path>
+                                <path d="M2 12h2"></path>
+                                <path d="M20 12h2"></path>
+                                <path d="m6.34 17.66-1.41 1.41"></path>
+                                <path d="m19.07 4.93-1.41 1.41"></path>
+                            </svg>
+                        </span>
                     </button>
                 </div>
             </div>
 
             <div class="flex flex-col lg:flex-row gap-3 sm:gap-5 mt-3 min-h-[calc(100vh-120px)] lg:h-[87vh]">
-                <div class="bg-secondary w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2  animate-slideInLeft order-2 lg:order-1">
+                <div class="bg-secondary w-full lg:w-[15vw] lg:min-w-[250px] rounded-lg p-3 sm:p-4 flex flex-col gap-2 animate-slideInLeft order-2 lg:order-1">
                     <a href="#" class="flex rounded-lg bg-background-light w-full p-3 hover:bg-[#2e3159] transition-all duration-300 hover:scale-105 transform">
                         <i class="bx bx-home text-lg sm:text-xl pr-2"></i>
                         <p class="text-sm sm:text-base">Inicio</p>
@@ -64,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5  animate-slideInRight order-1 lg:order-2">
+                <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 animate-slideInRight order-1 lg:order-2">
                     <div class="rounded-xl flex-1 flex flex-col justify-center items-center animate-fadeIn overflow-auto">
                         <div class="">
                             <div id="chat-logo" class="">
@@ -94,11 +113,24 @@
         <script>
             AOS.init();
 
-            const toggleMode = document.querySelector("#toggleMode");
-            const html = document.querySelector("html");
+            const html = document.documentElement;
+            const toggleBtn = document.getElementById("theme-toggle");
 
-            toggleMode.addEventListener("click", () => {
-                html.classList.toggle("dark");
+            // Al cargar la página, aplicar el tema guardado si existe
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme) {
+                html.classList.toggle("dark", savedTheme === "dark");
+            } else {
+                // Si no hay nada guardado, puedes detectar preferencia del sistema
+                if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    html.classList.add("dark");
+                }
+            }
+
+            // Evento para alternar entre claro y oscuro
+            toggleBtn.addEventListener("click", () => {
+                const isDark = html.classList.toggle("dark"); // alterna y devuelve true si se activó
+                localStorage.setItem("theme", isDark ? "dark" : "light");
             });
         </script>
     </body>

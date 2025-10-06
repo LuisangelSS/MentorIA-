@@ -53,26 +53,12 @@
                         <p class="text-sm sm:text-base">Quizzes</p>
                     </a>
 
-                    <h3 class="font-bold text-sm sm:text-base mt-1">Historial de estudio</h3>
+                    <h3 class="font-bold text-sm sm:text-base mt-1 flex items-center justify-between">
+                        <span>Historial de estudio</span>
+                        <button id="new-chat-btn" class="text-xs px-2 py-1 rounded-lg bg-background hover:bg-secondary transition">Nuevo</button>
+                    </h3>
                     <div class="h-10 bg-background-light rounded-xl p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar flex-1 min-h-0">
-                        <ul class="flex flex-col gap-2 overflow-auto custom-scrollbar">
-                            <a href="#">
-                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Primera guerra mundial</li>
-                            </a>
-                            <a href="#">
-                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Curso de Docker</li>
-                            </a>
-                            <a href="#">
-                                <li class="p-2 hover:bg-secondary truncate rounded-lg">Teoria del multiverso</li>
-                            </a>
-                            <a href="#">
-                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
-                            </a>
-                            <a href="#">
-                                <li class="p-2 hover:bg-secondary truncate rounded-lg">La singularidad</li>
-                            </a>
-                            
-                        </ul>
+                        <ul id="chat-sessions-list" class="flex flex-col gap-2 overflow-auto custom-scrollbar"></ul>
                     </div>
                     <div id="account-card" role="button" tabindex="0" title="Ver perfil" class="flex items-center gap-3 p-3 bg-background-light rounded-lg transition-all duration-300 hover:scale-105 transform cursor-pointer">
                         <div class="w-8 h-8 sm:w-10 sm:h-10 bg-secondary rounded-full flex items-center justify-center">
@@ -108,6 +94,7 @@
                     </div>
                     <script src="js/script.js"></script>
                     <script src="js/user.js"></script>
+                    <script src="js/chat-sessions.js"></script>
                 </div>
             </div>
             <div id="particles-js" class="absolute top-0 left-0 w-full h-full -z-10"></div>

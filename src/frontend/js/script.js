@@ -5,6 +5,9 @@ const chatBox = document.getElementById("chat-box");
 const chatTitle = document.getElementById("chat-title");
 const chatLogo = document.getElementById("chat-logo");
 
+// Estado global de la sesión de chat actual (gestionado también por chat-sessions.js)
+window.currentChatSessionId = window.currentChatSessionId || null;
+
 function renderMarkdownToHtml(markdownText) {
   if (!markdownText) return "";
   const rawHtml = window.marked ? window.marked.parse(markdownText) : markdownText;
@@ -32,13 +35,15 @@ button.addEventListener("click", async (e) => {
   input.value = "";
 
   try {
-    // Obtener userId del localStorage si está disponible
-    const userId = localStorage.getItem('userId');
-    
+    const userToken = localStorage.getItem('userToken');
+
     const res = await fetch("/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, userId })
+      headers: { 
+        "Content-Type": "application/json",
+        ...(userToken ? { "Authorization": `Bearer ${userToken}` } : {})
+      },
+      body: JSON.stringify({ prompt, chatSessionId: window.currentChatSessionId || undefined })
     });
 
     const data = await res.json();
@@ -52,6 +57,15 @@ button.addEventListener("click", async (e) => {
 
     // Mantener el scroll al final
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Si el servidor devolvió chatSessionId (por ejemplo, al crear una nueva implícitamente), actualizar estado y refrescar sesiones
+    if (data.chatSessionId && !window.currentChatSessionId) {
+      window.currentChatSessionId = data.chatSessionId;
+    }
+    // Intentar actualizar lista de sesiones si existe el manejador
+    if (window.refreshChatSessionsList) {
+      try { await window.refreshChatSessionsList(); } catch {}
+    }
   } catch (err) {
     console.error(err);
   }

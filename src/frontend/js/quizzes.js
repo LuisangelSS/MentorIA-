@@ -108,8 +108,9 @@ ${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-backgroun
 
   document.getElementById('submit-quiz')?.addEventListener('click', async () => {
     const answers = [];
-    for (let i = 0; i < 10; i++) {
-      const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const totalQuestions = quiz?.questions?.length ?? 10;
+    for (let i = 0; i < totalQuestions; i++) {
+      const selected = document.querySelector(`input[name=\"q${i}\"]:checked`);
       answers.push(selected ? Number(selected.value) : -1);
     }
 
@@ -125,10 +126,44 @@ ${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-backgroun
       const data = await res.json();
       const resultBox = document.getElementById('quiz-result');
       if (!res.ok) {
-        resultBox.innerHTML = `<div class="bg-red-700 text-text p-3 rounded-lg font-bold">${escapeHtml(data.error || 'Error al enviar intento')}</div>`;
+        resultBox.innerHTML = `<div class=\"bg-red-700 text-text p-3 rounded-lg font-bold\">${escapeHtml(data.error || 'Error al enviar intento')}</div>`;
         return;
       }
-      resultBox.innerHTML = `<div class="bg-green-700 text-text p-3 rounded-lg font-bold">Puntaje: ${data.score}/${data.total} (${data.percentage}%)</div>`;
+
+      // Render puntaje
+      const scoreInfo = `<div class=\"bg-green-700 text-text p-3 rounded-lg font-bold\">Puntaje: ${data.score}/${data.total} (${data.percentage}%)</div>`;
+
+      // Intentar obtener respuestas correctas desde la respuesta del servidor
+      let correctIndexes = null;
+      if (Array.isArray(data.correctAnswers)) {
+        // Puede venir como índices o como texto; solo aceptamos índices aquí
+        correctIndexes = data.correctAnswers.map((v) => (typeof v === 'number' ? v : -1));
+      } else if (Array.isArray(data.results)) {
+        // Estructura posible: [{ correct: true/false, correctIndex: n }]
+        correctIndexes = data.results.map((r) => (typeof r?.correctIndex === 'number' ? r.correctIndex : -1));
+      }
+
+      // Si el servidor no envía detalles, intentar deducir desde el quiz en el cliente
+      const incorrectDetails = buildIncorrectDetails(quiz, answers, correctIndexes);
+
+      if (incorrectDetails.length === 0) {
+        resultBox.innerHTML = `${scoreInfo}\n<div class=\"mt-3 bg-background-light text-text p-3 rounded-lg\">¡Perfecto! No fallaste ninguna pregunta.</div>`;
+      } else {
+        const listHtml = incorrectDetails.map((item, idx) => {
+          const qNum = item.index + 1;
+          const question = escapeHtml(item.question || 'Pregunta');
+          const correct = escapeHtml(item.correctAnswerText || '');
+          return `
+            <div class=\"bg-background-light p-3 rounded-lg\">
+              <div class=\"font-bold text-text\">${qNum}. ${question}</div>
+              <div class=\"text-text/80\">Respuesta correcta: <span class=\"font-bold\">${correct}</span></div>
+            </div>
+          `;
+        }).join('');
+
+        resultBox.innerHTML = `${scoreInfo}\n<div class=\"mt-3 grid gap-2\">${listHtml}</div>`;
+      }
+
       // refrescar recientes
       loadRecentQuizzes();
     } catch (err) {
@@ -198,6 +233,66 @@ function escapeHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// Intenta construir el detalle de preguntas incorrectas usando
+// (a) índices correctos provistos por el servidor o
+// (b) los datos del quiz en el cliente si incluyen la respuesta correcta.
+function buildIncorrectDetails(quiz, userAnswers, correctIndexesFromServer) {
+  const details = [];
+  const questions = Array.isArray(quiz?.questions) ? quiz.questions : [];
+  const n = Math.min(questions.length, userAnswers.length);
+
+  for (let i = 0; i < n; i++) {
+    const q = questions[i] || {};
+    const options = Array.isArray(q.options) ? q.options : [];
+    const userIdx = typeof userAnswers[i] === 'number' ? userAnswers[i] : -1;
+
+    let correctIdx = null;
+    if (Array.isArray(correctIndexesFromServer) && typeof correctIndexesFromServer[i] === 'number') {
+      correctIdx = correctIndexesFromServer[i];
+    } else {
+      correctIdx = getCorrectIndexFromQuestion(q);
+    }
+
+    if (typeof correctIdx === 'number' && correctIdx >= 0 && correctIdx < options.length) {
+      if (userIdx !== correctIdx) {
+        details.push({
+          index: i,
+          question: q.question,
+          correctIndex: correctIdx,
+          correctAnswerText: options[correctIdx]
+        });
+      }
+    }
+  }
+
+  return details;
+}
+
+// Heurística para obtener el índice correcto desde la estructura de la pregunta
+function getCorrectIndexFromQuestion(q) {
+  if (!q) return null;
+  // casos comunes por índice numérico
+  if (typeof q.correctIndex === 'number') return q.correctIndex;
+  if (typeof q.answerIndex === 'number') return q.answerIndex;
+  if (typeof q.correct_option_index === 'number') return q.correct_option_index;
+
+  // casos por texto correcto
+  const options = Array.isArray(q.options) ? q.options : [];
+  const candidates = [q.correct, q.correctAnswer, q.correct_option, q.answer];
+  for (const cand of candidates) {
+    if (typeof cand === 'string') {
+      const idx = options.findIndex(opt => normalizeStr(opt) === normalizeStr(cand));
+      if (idx !== -1) return idx;
+    }
+  }
+  return null;
+}
+
+function normalizeStr(s) {
+  if (typeof s !== 'string') return '';
+  return s.trim().toLowerCase();
 }

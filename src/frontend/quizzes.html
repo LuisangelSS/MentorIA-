@@ -22,43 +22,29 @@
             <div class="p-3 px-6 rounded-lg bg-background-light flex flex-col gap-10">
                 <h1 class="mt-10 font-bold text-5xl lg:text-6xl 2xl:text-8xl text-text text-center">Genera un Quizz con IA</h1>
                 <h2 class="text-text font-bold text-xl lg:text-2xl 2xl:text-3xl text-center">del tema de preferencia que quieras.</h2>
-                <div class="flex justify-center">
-                    <form action="" method="post" class="w-full max-w-3xl">
-                        <div class="bg-secondary rounded-full w-full">
-                            <input type="text" placeholder="Escribe el tema aquí" class="outline-none w-full p-6 bg-transparent text-xl text-text" />
+<div class="flex justify-center">
+                    <form id="quiz-form" class="w-full max-w-3xl">
+                        <div class="flex gap-3 items-center">
+                            <div class="bg-secondary rounded-full w-full">
+                                <input id="topic-input" type="text" placeholder="Escribe el tema aquí" class="outline-none w-full p-6 bg-transparent text-xl text-text" />
+                            </div>
+                            <select id="difficulty-select" class="bg-secondary text-text p-3 rounded-lg font-bold">
+                                <option value="basico">Básico</option>
+                                <option value="intermedio" selected>Intermedio</option>
+                                <option value="avanzado">Avanzado</option>
+                            </select>
+                            <button id="generate-btn" class="p-3 rounded-lg bg-secondary text-text font-bold">Generar</button>
                         </div>
                     </form>
                 </div>
+
+                <div id="quiz-area" class="max-w-3xl w-full mx-auto"></div>
                 <h2 class="font-black text-4xl text-text text-center">Quizzes recientes</h2>
                 <div class="flex flex-col items-center">
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-3 2xl:grid-cols-4 max-w-[1300px]">
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                        <div class="bg-secondary p-4 rounded-lg">
-                            <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">Primera Guerra Mundial y Segunda</h3>
-                            <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
-                        </div>
-                    </div>
+<div id="recent-quizzes-grid" class="grid grid-cols-2 gap-4 md:grid-cols-3 2xl:grid-cols-4 max-w-[1300px]"></div>
                 </div>
             </div>
         </div>
+        <script src="js/quizzes.js"></script>
     </body>
 </html>

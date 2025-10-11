@@ -63,7 +63,10 @@
 
                     <div class="flex items-center mt-1 mb-1">
                         <input type="checkbox" name="terms" id="terms" required class="mr-2" />
-                        <label for="terms" class="text-sm sm:text-base">Aceptar términos y condiciones.</label>
+                        <label for="terms" class="text-sm sm:text-base">
+                            Aceptar 
+                            <span id="openTermsModal" class="text-accent underline cursor-pointer hover:text-[#7b82d9] transition-colors">términos y condiciones</span>.
+                        </label>
                     </div>
 
                     <button type="submit" id="submitBtn" class="mt-2 sm:mt-2 p-1 sm:p-2 bg-secondary text-text font-black text-lg sm:text-xl rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">Crear cuenta</button>
@@ -87,6 +90,138 @@
             </span>
         </button>
         <div id="particles-js" class="absolute top-0 left-0 w-full h-full -z-10"></div>
+
+        <!-- Modal de Términos y Condiciones -->
+        <div id="termsModal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+            <div class="bg-background rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+                <!-- Header del Modal -->
+                <div class="bg-accent text-background-light p-6 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Términos y Condiciones de Uso</h2>
+                    <button id="closeModal" class="text-background-light hover:text-white text-2xl font-bold">&times;</button>
+                </div>
+                
+                <!-- Contenido del Modal -->
+                <div class="p-6 overflow-y-auto  max-h-[calc(90vh-200px)] custom-scrollbar">
+                    <div class="prose prose-lg max-w-none text-text">
+                        <h1 class="text-3xl font-bold text-accent mb-6">Términos y Condiciones de Uso y Política de Datos</h1>
+                        
+                        <p class="text-lg mb-6"><strong>Bienvenido/a a MentorIA - Plataforma de Aprendizaje Personalizado con Inteligencia Artificial.</strong></p>
+                        
+                        <p class="mb-6">Al hacer clic en "Aceptar y Continuar" y acceder a nuestros servicios, usted reconoce haber leído, entendido y aceptado incondicionalmente estos Términos y Condiciones de Uso y nuestra Política de Datos. <strong>La no aceptación de estos términos impide la continuación y el acceso a la plataforma.</strong></p>
+
+                        <hr class="my-8 border-border">
+
+                        <h2 class="text-2xl font-bold text-text mb-4">1. Información General y Propósito</h2>
+                        
+                        <div class="overflow-x-auto mb-6">
+                            <table class="w-full border-collapse border border-border">
+                                <thead>
+                                    <tr class="bg-secondary">
+                                        <th class="border border-border p-3 text-left font-bold">Cláusula</th>
+                                        <th class="border border-border p-3 text-left font-bold">Detalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Plataforma</td>
+                                        <td class="border border-border p-3"><strong>MentorIA - Plataforma de Aprendizaje Personalizado con Inteligencia Artificial</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Servicio</td>
+                                        <td class="border border-border p-3">Plataforma web educativa que utiliza <strong>Inteligencia Artificial</strong> para crear experiencias de aprendizaje personalizadas, generando contenido adaptativo, quizzes interactivos y asistencia de estudio mediante chat con IA.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Desarrolladores</td>
+                                        <td class="border border-border p-3"><strong>Luis Elier Pujols (2023-1667) y Luis Ángel Sánchez (2023-1681)</strong>. Proyecto Académico del Instituto Tecnológico de las Américas (ITLA) (Proyecto Final TDS (SDN) 2025-C-3).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Contacto</td>
+                                        <td class="border border-border p-3">Email de contacto: <strong>soporte@mentoria.com</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h2 class="text-2xl font-bold text-text mb-4">2. Aceptación y Obligatoriedad</h2>
+                        <p class="mb-6">El uso de los servicios de MentorIA está condicionado a la <strong>aceptación expresa</strong> de estos Términos. Al ser un sistema de gestión académica y personalización, requerimos que el usuario acepte de forma inequívoca estas condiciones para garantizar el correcto funcionamiento del servicio y el cumplimiento de las normativas de datos.</p>
+                        <p class="mb-6 font-bold text-error">Si no acepta estos Términos, deberá abstenerse de utilizar MentorIA.</p>
+
+                        <h2 class="text-2xl font-bold text-text mb-4">3. Propiedad Intelectual y Derechos de Autor</h2>
+                        <ol class="list-decimal list-inside mb-6 space-y-3">
+                            <li><strong>Contenido de MentorIA:</strong> El diseño, código fuente, algoritmos de IA, logotipos y la marca "MentorIA" son propiedad intelectual de sus desarrolladores (Luis Elier Pujols y Luis Ángel Sánchez) y están protegidos por las leyes de derecho de autor.</li>
+                            <li><strong>Contenido Generado por IA:</strong> El contenido educativo (tutoriales, quizzes, respuestas del chat) generado por la IA es puesto a disposición del usuario solo para fines académicos y personales. El usuario <strong>no está autorizado</strong> a revender, republicar o utilizar con fines comerciales masivos el contenido generado.</li>
+                            <li><strong>Restricciones:</strong> El usuario se compromete a no realizar ingeniería inversa, descompilación o cualquier intento de acceder al código o los algoritmos de la IA.</li>
+                        </ol>
+
+                        <h2 class="text-2xl font-bold text-text mb-4"> 4. Política de Datos de Usuario</h2>
+                        <p class="mb-4">En MentorIA, la privacidad y seguridad de sus datos son prioritarias.</p>
+
+                        <h3 class="text-xl font-bold text-text mb-3">4.1. Datos Recopilados y Finalidad:</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="w-full border-collapse border border-border">
+                                <thead>
+                                    <tr class="bg-secondary">
+                                        <th class="border border-border p-3 text-left font-bold">Tipo de Datos Recopilados</th>
+                                        <th class="border border-border p-3 text-left font-bold">Finalidad Principal del Tratamiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Identificación</td>
+                                        <td class="border border-border p-3">(Nombre de usuario, Correo, Contraseña encriptada) - <strong>Autenticación</strong> y gestión de la cuenta, seguridad.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Actividad Académica</td>
+                                        <td class="border border-border p-3">(Historial de conversiones, Quizzes, Progreso) - <strong>Personalización</strong> de la experiencia de aprendizaje (función central de la IA adaptativa) y seguimiento académico.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-border p-3 font-bold">Preferencias</td>
+                                        <td class="border border-border p-3">(Tema claro/oscuro) - Mejora de la <strong>experiencia de usuario (UX)</strong> y la usabilidad.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-text mb-3">4.2. Principios de Privacidad:</h3>
+                        <ol class="list-decimal list-inside mb-6 space-y-3">
+                            <li><strong>Minimización:</strong> Solo recopilamos los datos estrictamente necesarios para ofrecer el servicio de aprendizaje personalizado.</li>
+                            <li><strong>Seguridad:</strong> Las contraseñas se almacenan mediante <strong>encriptación bcrypt</strong>.</li>
+                            <li><strong>Transparencia:</strong> El historial de conversaciones se almacena <strong>únicamente para mantener el contexto educativo</strong> y el progreso académico.</li>
+                            <li><strong>No Compartición:</strong> <strong>MentorIA no compartirá, venderá o alquilará sus datos personales de identificación (nombre, email) a terceros con fines publicitarios o comerciales secundarios.</strong></li>
+                        </ol>
+
+                        <h3 class="text-xl font-bold text-text mb-3">4.3. Derechos del Usuario:</h3>
+                        <p class="mb-6">Usted tiene derecho a acceder, rectificar o solicitar la eliminación de sus datos personales. Puede ejercer estos derechos enviando una solicitud a nuestro <strong>Email de contacto: soporte@mentoria.com</strong>.</p>
+
+                        <h2 class="text-2xl font-bold text-text mb-4">5. Obligaciones y Responsabilidades del Usuario</h2>
+                        <ol class="list-decimal list-inside mb-6 space-y-3">
+                            <li><strong>Veracidad:</strong> El usuario garantiza que toda la información que proporciona es veraz y actualizada (especialmente el correo electrónico).</li>
+                            <li><strong>Contraseña:</strong> El usuario es responsable de mantener la confidencialidad de su contraseña.</li>
+                            <li><strong>Uso Prohibido:</strong> Está prohibido el uso de la plataforma para cualquier propósito ilegal, ofensivo, o que intente dañar o sobrecargar el servicio de la IA.</li>
+                            <li><strong>Mayoría de Edad:</strong> El usuario declara ser mayor de edad o contar con el consentimiento y supervisión de un adulto o tutor legal para el uso de la plataforma.</li>
+                        </ol>
+
+                        <h2 class="text-2xl font-bold text-text mb-4">6. Limitación de Responsabilidad</h2>
+                        <p class="mb-6"><strong>MentorIA</strong> es un proyecto académico y se ofrece "tal cual" (<em>as is</em>). Los desarrolladores no garantizan que la plataforma esté libre de errores o interrupciones. La información generada por la IA es para fines educativos y no debe considerarse como asesoramiento profesional o sustituto de instrucción humana certificada. <strong>Los desarrolladores no serán responsables por decisiones académicas o de otro tipo tomadas por el usuario basadas en el contenido de la plataforma.</strong></p>
+
+                        <hr class="my-8 border-border">
+
+                        <h2 class="text-2xl font-bold text-text mb-4">Conclusión</h2>
+                        <p class="mb-6">Al pulsar el botón a continuación, confirmo que he leído y acepto la totalidad de los <strong>Términos y Condiciones de Uso y la Política de Datos de MentorIA.</strong></p>
+                    </div>
+                </div>
+                
+                <!-- Footer del Modal -->
+                <div class="bg-secondary p-6 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="acceptTerms" class="cursor-pointer px-8 py-4 bg-accent text-background-light rounded-lg font-bold hover:bg-[#7b82d9] transition-colors text-lg">
+                         Aceptar Terminos
+                    </button>
+                    <button id="rejectTerms" class="cursor-pointer px-8 py-4 border-2 border-accent text-accent rounded-lg font-bold hover:bg-accent hover:text-background-light transition-colors text-lg">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     </body>
     <script src="js/registro.js"></script>
     <script>

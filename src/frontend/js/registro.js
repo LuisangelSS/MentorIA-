@@ -1,3 +1,68 @@
+// Variables del modal
+let termsAccepted = false;
+
+// Funcionalidad del modal de términos y condiciones
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('termsModal');
+    const openModalBtn = document.getElementById('openTermsModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const acceptTermsBtn = document.getElementById('acceptTerms');
+    const rejectTermsBtn = document.getElementById('rejectTerms');
+    const termsCheckbox = document.getElementById('terms');
+
+    // Abrir modal al hacer clic en "términos y condiciones"
+    openModalBtn.addEventListener('click', function() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    });
+
+    // Cerrar modal con botón X
+    closeModalBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    });
+
+    // Cerrar modal al hacer clic fuera del contenido
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Aceptar términos
+    acceptTermsBtn.addEventListener('click', function() {
+        termsAccepted = true;
+        termsCheckbox.checked = true;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+        showMessage('Términos y condiciones aceptados', 'success');
+    });
+
+    // Rechazar términos
+    rejectTermsBtn.addEventListener('click', function() {
+        termsAccepted = false;
+        termsCheckbox.checked = false;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+        showMessage('Debes aceptar los términos y condiciones para continuar', 'error');
+    });
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    });
+});
+
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -17,6 +82,12 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             
             if (userData.password.length < 6) {
                 showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            // Verificar que los términos hayan sido aceptados
+            if (!termsAccepted) {
+                showMessage('Debes aceptar los términos y condiciones para continuar', 'error');
                 return;
             }
             

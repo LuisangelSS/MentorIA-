@@ -29,7 +29,12 @@ import {
   getProgressSummary,
   getOrCreateActiveChatSession, 
   addChatMessage, 
-  getUserChatHistory
+  getUserChatHistory,
+  getUserChatSessions,
+  getChatHistory,
+  createChatSession,
+  getChatSessionById,
+  updateChatSessionName
 } from "./db.js";
 
 // -----------------------------
@@ -340,26 +345,31 @@ app.put("/profile/update-all", validateToken, (req, res) => {
 });
 
 // -----------------------------
-// Endpoint de chat con Gemini (con contexto)
+// Endpoint de chat con Gemini (con contexto) - autenticado y con soporte de sesiones específicas
 // -----------------------------
-app.post("/chat", async (req, res) => {
-    const { prompt, userId } = req.body;
+app.post("/chat", validateToken, async (req, res) => {
+    const { prompt, chatSessionId } = req.body;
+    const userId = req.user.user_id;
 
     if (!prompt) {
         return res.status(400).json({ error: "Prompt requerido" });
     }
 
     try {
-        // Obtener o crear sesión de chat activa
-        let chatSession;
-        if (userId) {
+        // Resolver sesión de chat a usar
+        let chatSession = null;
+        if (chatSessionId) {
+            const owned = getChatSessionById(userId, chatSessionId);
+            if (!owned) return res.status(404).json({ error: "Sesión de chat no encontrada" });
+            chatSession = owned;
+        } else {
             chatSession = getOrCreateActiveChatSession(userId);
         }
 
-        // Obtener historial de conversación (últimos 10 mensajes para mantener contexto)
+        // Historial (últimos 10)
         let chatHistory = [];
         if (chatSession) {
-            chatHistory = getUserChatHistory(userId, 10);
+            chatHistory = getChatHistory(chatSession.id, 10);
         }
 
         // Construir el array de contenidos con el historial
@@ -439,13 +449,27 @@ app.post("/chat", async (req, res) => {
         const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta";
         const reply = marked.parse(rawReply);
 
-        // Guardar mensajes en la base de datos si hay sesión activa
+        // Guardar mensajes en la base de datos
         if (chatSession) {
             addChatMessage(chatSession.id, 'user', prompt);
             addChatMessage(chatSession.id, 'assistant', rawReply);
         }
 
-        res.json({ reply });
+        // Autonombrar la sesión si aún tiene el nombre por defecto
+        try {
+            if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
+                const title = await generateChatTitle(prompt, rawReply);
+                if (title) {
+                    updateChatSessionName(chatSession.id, title);
+                    // refrescar objeto en memoria (no crítico)
+                    chatSession.session_name = title;
+                }
+            }
+        } catch (e) {
+            // No bloquear la respuesta por fallo en titulación
+        }
+
+        res.json({ reply, chatSessionId: chatSession?.id, sessionName: chatSession?.session_name });
     } catch (error) {
         console.error("Error al comunicarse con Gemini:", error);
         res.status(500).json({ error: "Error al comunicarse con Gemini" });
@@ -533,6 +557,77 @@ function normalizeQuizSchema(quiz, { topic, difficulty }) {
 
   return out;
 }
+
+// -----------------------------
+// Helper: generar título breve para la sesión
+// -----------------------------
+async function generateChatTitle(userPrompt, rawAssistantReply) {
+  // Prompt breve para el modelo: título conciso en español (máx. 6 palabras)
+  const instruction = `Crea un título muy breve (máximo 6 palabras) en español que resuma el tema de esta conversación de estudio. Devuelve solo el título, sin comillas ni puntuación extra.`;
+  const contextText = `Usuario: ${userPrompt}\nAsistente: ${rawAssistantReply}`.slice(0, 1000);
+  try {
+    const r = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        { role: 'user', parts: [{ text: `${instruction}\n\n${contextText}` }] }
+      ],
+      generationConfig: { temperature: 0.2 }
+    });
+    let title = r?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    title = (title || '').toString()
+      .replace(/[`*_#>\-]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!title) {
+      // Fallback simple: usar primeras palabras del prompt
+      title = (userPrompt || '').toString().replace(/\s+/g, ' ').trim();
+    }
+    // Limitar a ~50 caracteres y a 6 palabras
+    const words = title.split(' ').filter(Boolean).slice(0, 6);
+    title = words.join(' ');
+    if (title.length > 60) title = title.slice(0, 60);
+    if (!title) title = 'Nueva conversación';
+    return title;
+  } catch (e) {
+    // Fallback: derivado del prompt
+    let t = (userPrompt || '').toString().replace(/[`*_#>\-]/g, '').replace(/\s+/g, ' ').trim();
+    const words = t.split(' ').filter(Boolean).slice(0, 6);
+    t = words.join(' ');
+    if (!t) t = 'Nueva conversación';
+    return t;
+  }
+}
+
+// -----------------------------
+// Endpoints de gestión de sesiones de chat
+// -----------------------------
+
+// Listar sesiones del usuario
+app.get("/chats/sessions", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const sessions = getUserChatSessions(userId);
+  res.json({ sessions });
+});
+
+// Crear nueva sesión
+app.post("/chats/sessions", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const { name } = req.body || {};
+  const id = createChatSession(userId, (name && name.trim()) || undefined);
+  const session = getChatSessionById(userId, id);
+  res.json({ session });
+});
+
+// Obtener mensajes de una sesión
+app.get("/chats/:sessionId/messages", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const sessionId = parseInt(req.params.sessionId, 10);
+  if (Number.isNaN(sessionId)) return res.status(400).json({ error: "ID inválido" });
+  const session = getChatSessionById(userId, sessionId);
+  if (!session) return res.status(404).json({ error: "Sesión no encontrada" });
+  const messages = getChatHistory(sessionId, 100);
+  res.json({ session, messages });
+});
 
 // -----------------------------
 // Endpoints de quizzes con Gemini

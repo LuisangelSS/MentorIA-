@@ -77,7 +77,7 @@ function renderQuiz(quizId, quiz, showBack = false) {
           <div class="text-text font-black text-2xl">${escapeHtml(quiz.topic)} (${escapeHtml(quiz.difficulty || '')})</div>
           <div class="text-text/80">10 preguntas</div>
         </div>
-${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-background-light text-text font-bold\">Ocultar Quizze</button>' : ''}
+${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-background-light text-text font-bold\">Ocultar Quizz</button>' : ''}
       </div>
     </div>
   `;

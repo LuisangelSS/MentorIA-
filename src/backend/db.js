@@ -256,16 +256,30 @@ export function getProgressSummary(userId) {
           (SELECT COALESCE(ROUND(AVG(100.0 * score / total), 2), 0) FROM quiz_attempts WHERE user_id = ?) AS avg_score
     `).get(userId, userId, userId);
 
+    // Obtener todos los intentos recientes (sin límite) con dificultad
     const recentAttempts = db.prepare(`
-        SELECT qa.id, qa.quiz_id, q.topic, qa.score, qa.total, qa.completed_at
+        SELECT qa.id, qa.quiz_id, q.topic, q.difficulty, qa.score, qa.total, qa.completed_at
         FROM quiz_attempts qa
         JOIN quizzes q ON qa.quiz_id = q.id
         WHERE qa.user_id = ?
         ORDER BY qa.completed_at DESC
-        LIMIT 10
     `).all(userId);
 
-    return { ...totals, recentAttempts };
+    // Obtener distribución de dificultad de todos los quizzes generados
+    const difficultyDistribution = db.prepare(`
+        SELECT 
+          difficulty,
+          COUNT(*) as count
+        FROM quizzes 
+        WHERE user_id = ?
+        GROUP BY difficulty
+    `).all(userId);
+
+    return { 
+        ...totals, 
+        recentAttempts,
+        difficultyDistribution 
+    };
 }
 
 // ----------------------------

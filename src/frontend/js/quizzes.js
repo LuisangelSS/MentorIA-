@@ -60,8 +60,8 @@ function renderInfo(text, type = 'info') {
   if (!area) return;
   const colors = {
     info: 'bg-background-light',
-    success: 'bg-green-700',
-    error: 'bg-red-700'
+    success: 'bg-success',
+    error: 'bg-error'
   };
   area.innerHTML = `<div class="${colors[type] || colors.info} text-text p-4 rounded-lg font-bold">${text}</div>`;
 }
@@ -74,8 +74,11 @@ function renderQuiz(quizId, quiz, showBack = false) {
     <div class="bg-secondary p-4 rounded-lg mb-4">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <div class="text-text font-black text-2xl">${escapeHtml(quiz.topic)} (${escapeHtml(quiz.difficulty || '')})</div>
-          <div class="text-text/80">10 preguntas</div>
+          <div class="text-text font-black text-2xl">${escapeHtml(quiz.topic)}</div>
+          <div class="flex items-center gap-3 mt-2">
+            <div class="text-text/80">10 preguntas</div>
+            <span class="px-3 py-1 bg-accent text-background-light rounded-full text-sm font-bold">${escapeHtml((quiz.difficulty || 'Intermedio').toUpperCase())}</span>
+          </div>
         </div>
 ${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-background-light text-text font-bold\">Ocultar Quizz</button>' : ''}
       </div>
@@ -126,12 +129,12 @@ ${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-backgroun
       const data = await res.json();
       const resultBox = document.getElementById('quiz-result');
       if (!res.ok) {
-        resultBox.innerHTML = `<div class=\"bg-red-700 text-text p-3 rounded-lg font-bold\">${escapeHtml(data.error || 'Error al enviar intento')}</div>`;
+        resultBox.innerHTML = `<div class=\"bg-error text-text p-3 rounded-lg font-bold\">${escapeHtml(data.error || 'Error al enviar intento')}</div>`;
         return;
       }
 
       // Render puntaje
-      const scoreInfo = `<div class=\"bg-green-700 text-text p-3 rounded-lg font-bold\">Puntaje: ${data.score}/${data.total} (${data.percentage}%)</div>`;
+      const scoreInfo = `<div class=\"bg-success text-text p-3 rounded-lg font-bold\">Puntaje: ${data.score}/${data.total} (${data.percentage}%)</div>`;
 
       // Intentar obtener respuestas correctas desde la respuesta del servidor
       let correctIndexes = null;
@@ -204,7 +207,10 @@ async function loadRecentQuizzes() {
     grid.innerHTML = data.items.map(item => `
       <div class="bg-secondary p-4 rounded-lg cursor-pointer hover:opacity-90" data-id="${item.id}">
         <h3 class="font-black text-text text-2xl md:text-3xl xl:text-4xl mb-4">${escapeHtml(item.topic)}</h3>
-        <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center">10 PREGUNTAS</div>
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <div class="bg-background-light p-2 rounded-lg font-bold text-text text-center flex-1">10 PREGUNTAS</div>
+          <span class="px-3 py-1 bg-accent text-background-light rounded-full text-sm font-bold">${escapeHtml((item.difficulty || 'Intermedio').toUpperCase())}</span>
+        </div>
       </div>
     `).join('');
 

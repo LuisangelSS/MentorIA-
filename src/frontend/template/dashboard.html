@@ -12,6 +12,28 @@
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="assets/particles.js"></script>
         <script src="js/theme-init.js"></script>
+        <style>
+            /* Estilos para animaciones de contador */
+            @keyframes counterUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .counter-animation {
+                animation: counterUp 0.8s ease-out forwards;
+            }
+            
+            .metric-card {
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .metric-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            }
+        </style>
     </head>
     <body class="bg-background text-text p-2 sm:p-2 h-screen">
         <main class="animate-fadeIn">
@@ -75,20 +97,29 @@
 
                 <div class="bg-background-light w-full lg:w-[85vw] rounded-lg p-3 sm:p-4 flex flex-col gap-5 animate-slideInRight order-1 lg:order-2">
                     <!-- Dashboard Content -->
-                    <div class="flex-1 overflow-auto">
+                    <div class="flex-1 overflow-auto custom-scrollbar">
                         <h1 class="font-black text-4xl mb-6">Dashboard de Progreso</h1>
 
                         <section id="metrics" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div class="bg-secondary p-6 rounded-lg">
-                                <div class="text-text/70 text-sm font-medium mb-2">Quizzes generados</div>
+                            <div class="bg-secondary p-6 rounded-lg metric-card futuristic-border">
+                                <div class="text-text/70 text-sm font-medium mb-2 flex items-center gap-2">
+                                    <i class="bx bx-message-question-mark text-accent"></i>
+                                    Quizzes generados
+                                </div>
                                 <div id="m-quizzes" class="text-text font-black text-4xl">0</div>
                             </div>
-                            <div class="bg-secondary p-6 rounded-lg">
-                                <div class="text-text/70 text-sm font-medium mb-2">Intentos realizados</div>
+                            <div class="bg-secondary p-6 rounded-lg metric-card futuristic-border">
+                                <div class="text-text/70 text-sm font-medium mb-2 flex items-center gap-2">
+                                    <i class="bx bx-clipboard-check text-accent"></i>
+                                    Intentos realizados
+                                </div>
                                 <div id="m-attempts" class="text-text font-black text-4xl">0</div>
                             </div>
-                            <div class="bg-secondary p-6 rounded-lg">
-                                <div class="text-text/70 text-sm font-medium mb-2">Promedio</div>
+                            <div class="bg-secondary p-6 rounded-lg metric-card futuristic-border">
+                                <div class="text-text/70 text-sm font-medium mb-2 flex items-center gap-2">
+                                    <i class="bx bx-trending-up text-accent"></i>
+                                    Promedio
+                                </div>
                                 <div class="text-text font-black text-4xl">
                                     <span id="m-avg">0</span>
                                     %

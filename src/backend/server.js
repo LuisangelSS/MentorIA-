@@ -56,7 +56,7 @@ const FRONTEND_DIR = path.join(__dirname, "../frontend");
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
 if (!process.env.GOOGLE_API_KEY) {
-  console.warn("⚠️  No se encontró la API Key. Revisa tu archivo .env");
+    console.warn("⚠️  No se encontró la API Key. Revisa tu archivo .env");
 }
 
 app.use(cors());
@@ -108,61 +108,61 @@ app.get('/dashboard', (req, res) => {
 // Endpoints de usuario / sesión
 // -----------------------------
 app.post("/register", (req, res) => {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
-  }
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+        return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
 
-  try {
-    const userId = registerUser(username, email, password);
-    res.json({ message: "Usuario registrado correctamente", userId });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al registrar usuario. Quizá el email o username ya existe." });
-  }
+    try {
+        const userId = registerUser(username, email, password);
+        res.json({ message: "Usuario registrado correctamente", userId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al registrar usuario. Quizá el email o username ya existe." });
+    }
 });
 
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: "Faltan campos obligatorios" });
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: "Faltan campos obligatorios" });
 
-  const user = findUserByEmail(email);
-  if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+    const user = findUserByEmail(email);
+    if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
 
-  if (!verifyPassword(password, user.password_hash)) {
-    return res.status(401).json({ error: "Contraseña incorrecta" });
-  }
+    if (!verifyPassword(password, user.password_hash)) {
+        return res.status(401).json({ error: "Contraseña incorrecta" });
+    }
 
-  const session = createSession(user.id, 24); // token válido por 24 horas
-  res.json({ token: session.token, expiresAt: session.expiresAt });
+    const session = createSession(user.id, 24); // token válido por 24 horas
+    res.json({ token: session.token, expiresAt: session.expiresAt });
 });
 
 app.post("/logout", (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).json({ error: "Falta token de sesión" });
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "Falta token de sesión" });
 
-  deleteSession(token);
-  res.json({ message: "Logout exitoso" });
+    deleteSession(token);
+    res.json({ message: "Logout exitoso" });
 });
 
 // Endpoint para obtener información del usuario autenticado
 app.get("/user-info", (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) {
-    return res.status(401).json({ error: "Token de autorización requerido" });
-  }
+    if (!token) {
+        return res.status(401).json({ error: "Token de autorización requerido" });
+    }
 
-  const session = validateSession(token);
-  if (!session) {
-    return res.status(401).json({ error: "Token inválido o expirado" });
-  }
+    const session = validateSession(token);
+    if (!session) {
+        return res.status(401).json({ error: "Token inválido o expirado" });
+    }
 
-  // Devolver información del usuario sin datos sensibles
-  res.json({
-    id: session.user_id,
-    username: session.username,
+    // Devolver información del usuario sin datos sensibles
+    res.json({
+        id: session.user_id,
+        username: session.username,
     email: session.email
-  });
+    });
 });
 
 // -----------------------------
@@ -172,183 +172,183 @@ app.get("/user-info", (req, res) => {
 // Middleware para validar token
 function validateToken(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) {
-    return res.status(401).json({ error: "Token de autorización requerido" });
-  }
+    if (!token) {
+        return res.status(401).json({ error: "Token de autorización requerido" });
+    }
 
-  const session = validateSession(token);
-  if (!session) {
-    return res.status(401).json({ error: "Token inválido o expirado" });
-  }
+    const session = validateSession(token);
+    if (!session) {
+        return res.status(401).json({ error: "Token inválido o expirado" });
+    }
 
-  req.user = session;
-  next();
+    req.user = session;
+    next();
 }
 
 // Actualizar nombre de usuario
 app.put("/profile/username", validateToken, (req, res) => {
-  const { newUsername } = req.body;
-  
-  if (!newUsername || newUsername.trim().length < 3) {
-    return res.status(400).json({ error: "El nombre de usuario debe tener al menos 3 caracteres" });
-  }
-  
-  try {
-    const success = updateUsername(req.user.user_id, newUsername.trim());
-    if (success) {
-      res.json({ message: "Nombre de usuario actualizado correctamente" });
-    } else {
-      res.status(500).json({ error: "Error al actualizar el nombre de usuario" });
+    const { newUsername } = req.body;
+
+    if (!newUsername || newUsername.trim().length < 3) {
+        return res.status(400).json({ error: "El nombre de usuario debe tener al menos 3 caracteres" });
     }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+
+    try {
+        const success = updateUsername(req.user.user_id, newUsername.trim());
+        if (success) {
+            res.json({ message: "Nombre de usuario actualizado correctamente" });
+        } else {
+            res.status(500).json({ error: "Error al actualizar el nombre de usuario" });
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 // Actualizar email
 app.put("/profile/email", validateToken, (req, res) => {
-  const { newEmail } = req.body;
-  
-  // Validación básica de email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!newEmail || !emailRegex.test(newEmail)) {
-    return res.status(400).json({ error: "Email inválido" });
-  }
-  
-  try {
-    const success = updateEmail(req.user.user_id, newEmail.toLowerCase().trim());
-    if (success) {
-      res.json({ message: "Email actualizado correctamente" });
-    } else {
-      res.status(500).json({ error: "Error al actualizar el email" });
+    const { newEmail } = req.body;
+
+    // Validación básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!newEmail || !emailRegex.test(newEmail)) {
+        return res.status(400).json({ error: "Email inválido" });
     }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+
+    try {
+        const success = updateEmail(req.user.user_id, newEmail.toLowerCase().trim());
+        if (success) {
+            res.json({ message: "Email actualizado correctamente" });
+        } else {
+            res.status(500).json({ error: "Error al actualizar el email" });
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 // Actualizar contraseña
 app.put("/profile/password", validateToken, (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ error: "Se requiere la contraseña actual y la nueva" });
-  }
-  
-  if (newPassword.length < 6) {
-    return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
-  }
-  
-  try {
-    // Verificar contraseña actual
-    const isCurrentPasswordValid = verifyCurrentPassword(req.user.user_id, currentPassword);
-    if (!isCurrentPasswordValid) {
-      return res.status(401).json({ error: "Contraseña actual incorrecta" });
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Se requiere la contraseña actual y la nueva" });
     }
-    
-    const success = updatePassword(req.user.user_id, newPassword);
-    if (success) {
-      res.json({ message: "Contraseña actualizada correctamente" });
-    } else {
-      res.status(500).json({ error: "Error al actualizar la contraseña" });
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+
+    try {
+        // Verificar contraseña actual
+        const isCurrentPasswordValid = verifyCurrentPassword(req.user.user_id, currentPassword);
+        if (!isCurrentPasswordValid) {
+            return res.status(401).json({ error: "Contraseña actual incorrecta" });
+        }
+
+        const success = updatePassword(req.user.user_id, newPassword);
+        if (success) {
+            res.json({ message: "Contraseña actualizada correctamente" });
+        } else {
+            res.status(500).json({ error: "Error al actualizar la contraseña" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Actualizar perfil completo (múltiples campos)
 app.put("/profile/update-all", validateToken, (req, res) => {
-  const { newUsername, newEmail, currentPassword, newPassword } = req.body;
-  const userId = req.user.user_id;
-  const errors = [];
-  const updates = [];
-  
-  try {
-    // Validar y actualizar username si se proporciona
-    if (newUsername && newUsername.trim().length > 0) {
-      if (newUsername.trim().length < 3) {
-        errors.push("El nombre de usuario debe tener al menos 3 caracteres");
-      } else {
-        try {
-          const success = updateUsername(userId, newUsername.trim());
-          if (success) {
-            updates.push("nombre de usuario");
-          }
-        } catch (error) {
-          errors.push(error.message);
+    const { newUsername, newEmail, currentPassword, newPassword } = req.body;
+    const userId = req.user.user_id;
+    const errors = [];
+    const updates = [];
+
+    try {
+        // Validar y actualizar username si se proporciona
+        if (newUsername && newUsername.trim().length > 0) {
+            if (newUsername.trim().length < 3) {
+                errors.push("El nombre de usuario debe tener al menos 3 caracteres");
+            } else {
+                try {
+                    const success = updateUsername(userId, newUsername.trim());
+                    if (success) {
+                        updates.push("nombre de usuario");
+                    }
+                } catch (error) {
+                    errors.push(error.message);
+                }
+            }
         }
-      }
-    }
-    
-    // Validar y actualizar email si se proporciona
-    if (newEmail && newEmail.trim().length > 0) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(newEmail)) {
-        errors.push("Email inválido");
-      } else {
-        try {
-          const success = updateEmail(userId, newEmail.toLowerCase().trim());
-          if (success) {
-            updates.push("email");
-          }
-        } catch (error) {
-          errors.push(error.message);
+
+        // Validar y actualizar email si se proporciona
+        if (newEmail && newEmail.trim().length > 0) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(newEmail)) {
+                errors.push("Email inválido");
+            } else {
+                try {
+                    const success = updateEmail(userId, newEmail.toLowerCase().trim());
+                    if (success) {
+                        updates.push("email");
+                    }
+                } catch (error) {
+                    errors.push(error.message);
+                }
+            }
         }
-      }
-    }
-    
-    // Validar y actualizar contraseña si se proporciona
-    if (newPassword && newPassword.length > 0) {
-      if (!currentPassword) {
-        errors.push("Se requiere la contraseña actual para cambiarla");
-      } else if (newPassword.length < 6) {
-        errors.push("La nueva contraseña debe tener al menos 6 caracteres");
-      } else {
-        // Verificar contraseña actual
-        const isCurrentPasswordValid = verifyCurrentPassword(userId, currentPassword);
-        if (!isCurrentPasswordValid) {
-          errors.push("Contraseña actual incorrecta");
-        } else {
-          const success = updatePassword(userId, newPassword);
-          if (success) {
-            updates.push("contraseña");
-          }
+
+        // Validar y actualizar contraseña si se proporciona
+        if (newPassword && newPassword.length > 0) {
+            if (!currentPassword) {
+                errors.push("Se requiere la contraseña actual para cambiarla");
+            } else if (newPassword.length < 6) {
+                errors.push("La nueva contraseña debe tener al menos 6 caracteres");
+            } else {
+                // Verificar contraseña actual
+                const isCurrentPasswordValid = verifyCurrentPassword(userId, currentPassword);
+                if (!isCurrentPasswordValid) {
+                    errors.push("Contraseña actual incorrecta");
+                } else {
+                    const success = updatePassword(userId, newPassword);
+                    if (success) {
+                        updates.push("contraseña");
+                    }
+                }
+            }
         }
-      }
-    }
-    
-    if (errors.length > 0) {
-      return res.status(400).json({ error: errors.join(", ") });
-    }
-    
-    if (updates.length === 0) {
-      return res.status(400).json({ error: "No hay cambios para actualizar" });
-    }
-    
-    // Si hay cambios en contraseña, invalidar todas las sesiones
-    if (updates.includes("contraseña")) {
-      // Aquí podríamos invalidar todas las sesiones del usuario
-      // Por simplicidad, solo devolvemos un mensaje
-    }
-    
-    res.json({ 
-      message: `Perfil actualizado correctamente. Campos actualizados: ${updates.join(", ")}`,
-      updatedFields: updates,
+
+        if (errors.length > 0) {
+            return res.status(400).json({ error: errors.join(", ") });
+        }
+
+        if (updates.length === 0) {
+            return res.status(400).json({ error: "No hay cambios para actualizar" });
+        }
+
+        // Si hay cambios en contraseña, invalidar todas las sesiones
+        if (updates.includes("contraseña")) {
+            // Aquí podríamos invalidar todas las sesiones del usuario
+            // Por simplicidad, solo devolvemos un mensaje
+        }
+
+        res.json({
+            message: `Perfil actualizado correctamente. Campos actualizados: ${updates.join(", ")}`,
+            updatedFields: updates,
       requiresRelogin: updates.includes("contraseña")
-    });
+        });
     
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
 });
 
 // -----------------------------
 // Endpoint de chat con Gemini (con contexto) - autenticado y con soporte de sesiones específicas
 // -----------------------------
 app.post("/chat", validateToken, async (req, res) => {
-    const { prompt, chatSessionId } = req.body;
+    const { prompt, chatSessionId, stream = false } = req.body;
     const userId = req.user.user_id;
 
     if (!prompt) {
@@ -374,11 +374,11 @@ app.post("/chat", validateToken, async (req, res) => {
 
         // Construir el array de contenidos con el historial
         const contents = [
-            {
-                role: "model",
-                parts: [
-                    {
-                        text: `
+                {
+                    role: "model",
+                    parts: [
+                        {
+                            text: `
                                   Eres MentorIA, un asistente de estudio inteligente y adaptable. Tu rol es actuar como un mentor académico profesional, enseñando, guiando, evaluando y ajustando tu forma de explicar según el desempeño, ritmo y comprensión del usuario.
                                   🧠 Rol y Propósito
                                   Enseña de manera clara, estructurada y progresiva cualquier tema académico solicitado.
@@ -422,8 +422,8 @@ app.post("/chat", validateToken, async (req, res) => {
                                   Imagina que vas en bicicleta y cada segundo pedaleas más fuerte. Tu velocidad aumenta cada segundo — eso es aceleración.
                                   Vamos a repasarlo con un ejemplo sencillo…"
               `,
-                    },
-                ],
+                        },
+                    ],
             }
         ];
 
@@ -441,38 +441,119 @@ app.post("/chat", validateToken, async (req, res) => {
             parts: [{ text: prompt }]
         });
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: contents,
+        if (stream) {
+            // Configurar headers para streaming
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Connection', 'keep-alive');
+
+            let fullResponse = '';
+            let isFirstChunk = true;
+
+            try {
+                const stream = await ai.models.generateContentStream({
+                    model: "gemini-2.5-flash",
+                    contents: contents,
+                });
+
+                for await (const chunk of stream) {
+                    const chunkText = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (chunkText) {
+                        fullResponse += chunkText;
+                        
+                        // Enviar el chunk al cliente
+                        if (isFirstChunk) {
+                            res.write(`data: ${JSON.stringify({ 
+                                type: 'start', 
+                                chatSessionId: chatSession?.id,
+                                sessionName: chatSession?.session_name 
+                            })}\n\n`);
+                            isFirstChunk = false;
+                        }
+                        
+                        res.write(`data: ${JSON.stringify({ 
+                            type: 'chunk', 
+                            text: chunkText 
+                        })}\n\n`);
+                    }
+                }
+
+                // Enviar señal de finalización
+                res.write(`data: ${JSON.stringify({ 
+                    type: 'end', 
+                    fullText: fullResponse 
+                })}\n\n`);
+
+                // Guardar mensajes en la base de datos
+                if (chatSession) {
+                    addChatMessage(chatSession.id, 'user', prompt);
+                    addChatMessage(chatSession.id, 'assistant', fullResponse);
+                }
+
+                // Autonombrar la sesión si aún tiene el nombre por defecto
+                try {
+                    if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
+                        const title = await generateChatTitle(prompt, fullResponse);
+                        if (title) {
+                            updateChatSessionName(chatSession.id, title);
+                            chatSession.session_name = title;
+                        }
+                    }
+                } catch (e) {
+                    // No bloquear la respuesta por fallo en titulación
+                }
+
+                res.end();
+            } catch (streamError) {
+                console.error("Error en streaming:", streamError);
+                res.write(`data: ${JSON.stringify({ 
+                    type: 'error', 
+                    error: 'Error en el streaming' 
+                })}\n\n`);
+                res.end();
+            }
+        } else {
+            // Respuesta tradicional (no streaming)
+            const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: contents,
         });
 
         const rawReply = response?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta";
         const reply = marked.parse(rawReply);
 
-        // Guardar mensajes en la base de datos
-        if (chatSession) {
-            addChatMessage(chatSession.id, 'user', prompt);
-            addChatMessage(chatSession.id, 'assistant', rawReply);
-        }
-
-        // Autonombrar la sesión si aún tiene el nombre por defecto
-        try {
-            if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
-                const title = await generateChatTitle(prompt, rawReply);
-                if (title) {
-                    updateChatSessionName(chatSession.id, title);
-                    // refrescar objeto en memoria (no crítico)
-                    chatSession.session_name = title;
-                }
+            // Guardar mensajes en la base de datos
+            if (chatSession) {
+                addChatMessage(chatSession.id, 'user', prompt);
+                addChatMessage(chatSession.id, 'assistant', rawReply);
             }
-        } catch (e) {
-            // No bloquear la respuesta por fallo en titulación
-        }
 
-        res.json({ reply, chatSessionId: chatSession?.id, sessionName: chatSession?.session_name });
+            // Autonombrar la sesión si aún tiene el nombre por defecto
+            try {
+                if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
+                    const title = await generateChatTitle(prompt, rawReply);
+                    if (title) {
+                        updateChatSessionName(chatSession.id, title);
+                        chatSession.session_name = title;
+                    }
+                }
+            } catch (e) {
+                // No bloquear la respuesta por fallo en titulación
+            }
+
+            res.json({ reply, chatSessionId: chatSession?.id, sessionName: chatSession?.session_name });
+        }
     } catch (error) {
         console.error("Error al comunicarse con Gemini:", error);
+        if (stream) {
+            res.write(`data: ${JSON.stringify({ 
+                type: 'error', 
+                error: 'Error al comunicarse con Gemini' 
+            })}\n\n`);
+            res.end();
+        } else {
         res.status(500).json({ error: "Error al comunicarse con Gemini" });
+        }
     }
 });
 
@@ -756,37 +837,37 @@ app.get("/progress/summary", validateToken, (req, res) => {
 // Función para abrir el navegador
 // -----------------------------
 function openBrowser() {
-  const serverUrl = `http://localhost:${PORT}`;
-  
-  let command;
-  switch (process.platform) {
+    const serverUrl = `http://localhost:${PORT}`;
+
+    let command;
+    switch (process.platform) {
     case 'darwin': // macOS
-      command = `open "${serverUrl}"`;
-      break;
+            command = `open "${serverUrl}"`;
+            break;
     case 'win32': // Windows
-      command = `start "" "${serverUrl}"`;
-      break;
-    default: // Linux y otros
-      command = `xdg-open "${serverUrl}"`;
-      break;
-  }
-  
-  exec(command, (error) => {
-    if (error) {
-      console.log('⚠️  No se pudo abrir el navegador automáticamente');
-      console.log(`📖 Abre manualmente: ${serverUrl}`);
-    } else {
-      console.log(`🌐 Navegador abierto automáticamente en ${serverUrl}`);
+            command = `start "" "${serverUrl}"`;
+            break;
+        default: // Linux y otros
+            command = `xdg-open "${serverUrl}"`;
+            break;
     }
-  });
+
+  exec(command, (error) => {
+        if (error) {
+      console.log('⚠️  No se pudo abrir el navegador automáticamente');
+            console.log(`📖 Abre manualmente: ${serverUrl}`);
+        } else {
+            console.log(`🌐 Navegador abierto automáticamente en ${serverUrl}`);
+        }
+    });
 }
 
 // 404 para rutas no encontradas (solo HTML/GET)
 app.use((req, res, next) => {
   if (req.method === 'GET' && req.accepts('html')) {
     return res.status(404).sendFile(path.join(FRONTEND_DIR, 'template', '404.html'));
-  }
-  next();
+    }
+    next();
 });
 
 // 404 genérico para otros tipos (JSON/text)
@@ -798,10 +879,10 @@ app.use((req, res) => {
 // Iniciar servidor
 // -----------------------------
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-  
-  // Abrir el navegador automáticamente 
-  setTimeout(() => {
-    openBrowser();
-  }, 1000);
+    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+
+    // Abrir el navegador automáticamente
+    setTimeout(() => {
+        openBrowser();
+    }, 1000);
 });

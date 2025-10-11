@@ -71,37 +71,37 @@ app.use(express.static(FRONTEND_DIR));
 
 // Ruta raíz - servir index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'index.html'));
 });
 
 // Ruta para la página de login
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'login.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'login.html'));
 });
 
 // Ruta para la página de registro
 app.get('/register', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'registro.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'registro.html'));
 });
 
 // Ruta para la aplicación principal
 app.get('/app', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'app.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'app.html'));
 });
 
 // Ruta para el perfil de usuario
 app.get('/profile', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'profile.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'profile.html'));
 });
 
 // Ruta para quizzes
 app.get('/quizzes', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'quizzes.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'quizzes.html'));
 });
 
 // Ruta para dashboard
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'template', 'dashboard.html'));
 });
 
 // -----------------------------
@@ -784,7 +784,7 @@ function openBrowser() {
 // 404 para rutas no encontradas (solo HTML/GET)
 app.use((req, res, next) => {
   if (req.method === 'GET' && req.accepts('html')) {
-    return res.status(404).sendFile(path.join(FRONTEND_DIR, '404.html'));
+    return res.status(404).sendFile(path.join(FRONTEND_DIR, 'template', '404.html'));
   }
   next();
 });

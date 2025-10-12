@@ -51,20 +51,44 @@
     }
 
     sessions.forEach(sess => {
+      const li = document.createElement('li');
+      li.className = 'p-2 hover:bg-secondary rounded-lg flex items-center justify-between group';
+      
+      // Contenedor principal del chat
+      const chatContainer = document.createElement('div');
+      chatContainer.className = 'flex items-center justify-between w-full';
+      
+      // Enlace para abrir el chat
       const a = document.createElement('a');
       a.href = '#';
-      const li = document.createElement('li');
-      li.className = 'p-2 hover:bg-secondary truncate rounded-lg';
-      li.textContent = sess.session_name || 'Nueva conversación';
+      a.className = 'flex-1 truncate pr-2';
+      a.textContent = sess.session_name || 'Nueva conversación';
+      
       if (window.currentChatSessionId === sess.id) {
         li.className += ' bg-secondary';
       }
+      
       a.addEventListener('click', async (e) => {
         e.preventDefault();
         await openSession(sess.id);
       });
-      a.appendChild(li);
-      sessionsListEl.appendChild(a);
+      
+      // Botón de eliminar
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded hover:bg-red-500/20 text-red-400 hover:text-red-300';
+      deleteBtn.innerHTML = '<i class="bx bx-trash text-sm"></i>';
+      deleteBtn.title = 'Eliminar conversación';
+      
+      deleteBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await deleteSession(sess.id);
+      });
+      
+      chatContainer.appendChild(a);
+      chatContainer.appendChild(deleteBtn);
+      li.appendChild(chatContainer);
+      sessionsListEl.appendChild(li);
     });
   }
 
@@ -124,6 +148,50 @@
       await loadSessions();
     } catch (e) {
       console.error('Error creando nueva sesión:', e);
+    }
+  }
+
+  async function deleteSession(sessionId) {
+    const userToken = localStorage.getItem('userToken');
+    if (!userToken) return;
+    
+    // Confirmar eliminación
+    if (!confirm('¿Estás seguro de que quieres eliminar esta conversación? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/chats/${sessionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${userToken}`
+        }
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        alert('Error al eliminar la conversación: ' + (error.error || 'Error desconocido'));
+        return;
+      }
+      
+      // Si la sesión eliminada era la actual, limpiar la vista
+      if (window.currentChatSessionId === sessionId) {
+        window.currentChatSessionId = null;
+        if (chatBox) chatBox.innerHTML = '';
+        if (chatTitle) chatTitle.style.display = '';
+        if (chatLogo) chatLogo.style.display = '';
+      }
+      
+      // Recargar la lista de sesiones
+      await loadSessions();
+      
+      // Mostrar mensaje de éxito
+      const data = await res.json();
+      console.log('Conversación eliminada:', data.message);
+      
+    } catch (e) {
+      console.error('Error eliminando sesión:', e);
+      alert('Error al eliminar la conversación. Por favor, intenta de nuevo.');
     }
   }
 

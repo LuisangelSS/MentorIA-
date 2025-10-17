@@ -6,6 +6,38 @@
   const chatTitle = document.getElementById('chat-title');
   const chatLogo = document.getElementById('chat-logo');
 
+  // Tooltip reutilizable
+  let tooltipEl = null;
+  function ensureTooltip() {
+    if (tooltipEl) return tooltipEl;
+    tooltipEl = document.createElement('div');
+    tooltipEl.className = 'pointer-events-none fixed z-50 px-2 py-1 rounded-md text-xs bg-background-light border border-gray-600 text-text shadow-lg opacity-0 transition-opacity duration-150';
+    document.body.appendChild(tooltipEl);
+    return tooltipEl;
+  }
+  function showTooltip(text) {
+    const el = ensureTooltip();
+    el.textContent = text;
+    el.style.opacity = '1';
+  }
+  function hideTooltip() {
+    if (!tooltipEl) return;
+    tooltipEl.style.opacity = '0';
+  }
+  function positionTooltip(evt) {
+    if (!tooltipEl) return;
+    const offset = 12;
+    let x = evt.clientX + offset;
+    let y = evt.clientY + offset;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = tooltipEl.getBoundingClientRect();
+    if (x + rect.width + 8 > vw) x = vw - rect.width - 8;
+    if (y + rect.height + 8 > vh) y = vh - rect.height - 8;
+    tooltipEl.style.left = x + 'px';
+    tooltipEl.style.top = y + 'px';
+  }
+
   // Estado global compartido con script.js
   window.currentChatSessionId = window.currentChatSessionId || null;
 
@@ -63,6 +95,11 @@
       a.href = '#';
       a.className = 'flex-1 truncate pr-2';
       a.textContent = sess.session_name || 'Nueva conversación';
+      // Tooltip estilizado
+      const fullName = (sess.session_name || 'Nueva conversación');
+      a.addEventListener('mouseenter', (e) => { showTooltip(fullName); positionTooltip(e); });
+      a.addEventListener('mousemove', (e) => positionTooltip(e));
+      a.addEventListener('mouseleave', hideTooltip);
       
       if (window.currentChatSessionId === sess.id) {
         li.className += ' bg-secondary';

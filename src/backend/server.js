@@ -34,7 +34,10 @@ import {
   getChatHistory,
   createChatSession,
   getChatSessionById,
-  updateChatSessionName
+  updateChatSessionName,
+  deleteChatSession,
+  deleteAllUserChatSessions,
+  deleteAllUserData
 } from "./db.js";
 
 // -----------------------------
@@ -708,6 +711,34 @@ app.get("/chats/:sessionId/messages", validateToken, (req, res) => {
   if (!session) return res.status(404).json({ error: "Sesión no encontrada" });
   const messages = getChatHistory(sessionId, 100);
   res.json({ session, messages });
+});
+
+// Eliminar una sesión de chat específica
+app.delete("/chats/:sessionId", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const sessionId = parseInt(req.params.sessionId, 10);
+  if (Number.isNaN(sessionId)) return res.status(400).json({ error: "ID inválido" });
+  
+  const success = deleteChatSession(userId, sessionId);
+  if (!success) return res.status(404).json({ error: "Sesión no encontrada" });
+  
+  res.json({ message: "Sesión eliminada correctamente" });
+});
+
+// Eliminar todas las conversaciones del usuario
+app.delete("/chats", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const deletedCount = deleteAllUserChatSessions(userId);
+  res.json({ message: `${deletedCount} conversaciones eliminadas correctamente` });
+});
+
+// Eliminar todos los datos del usuario (cuenta completa)
+app.delete("/user/delete-account", validateToken, (req, res) => {
+  const userId = req.user.user_id;
+  const success = deleteAllUserData(userId);
+  if (!success) return res.status(500).json({ error: "Error al eliminar la cuenta" });
+  
+  res.json({ message: "Cuenta eliminada correctamente" });
 });
 
 // -----------------------------

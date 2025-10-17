@@ -382,4 +382,31 @@ export function updateChatSessionName(sessionId, newName) {
     return info.changes > 0;
 }
 
+// Eliminar una sesión de chat específica (incluye todos sus mensajes por CASCADE)
+export function deleteChatSession(userId, sessionId) {
+    const stmt = db.prepare(`DELETE FROM chat_sessions WHERE id = ? AND user_id = ?`);
+    const result = stmt.run(sessionId, userId);
+    return result.changes > 0;
+}
+
+// Eliminar todas las sesiones de chat de un usuario
+export function deleteAllUserChatSessions(userId) {
+    const stmt = db.prepare(`DELETE FROM chat_sessions WHERE user_id = ?`);
+    const result = stmt.run(userId);
+    return result.changes;
+}
+
+// Eliminar todos los datos del usuario (chats, quizzes, intentos, etc.)
+export function deleteAllUserData(userId) {
+    // Las foreign keys con CASCADE se encargan de eliminar automáticamente:
+    // - chat_sessions -> chat_messages
+    // - quizzes -> quiz_attempts
+    // - user_sessions
+    // - user_settings
+    
+    const stmt = db.prepare(`DELETE FROM users WHERE id = ?`);
+    const result = stmt.run(userId);
+    return result.changes > 0;
+}
+
 export default db;

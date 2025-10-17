@@ -85,8 +85,9 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                 return;
             }
             
-            // Verificar que los términos hayan sido aceptados
-            if (!termsAccepted) {
+            // Verificar que los términos hayan sido aceptados (checkbox o vía modal)
+            const isTermsChecked = document.getElementById('terms') && document.getElementById('terms').checked;
+            if (!(termsAccepted || isTermsChecked)) {
                 showMessage('Debes aceptar los términos y condiciones para continuar', 'error');
                 return;
             }

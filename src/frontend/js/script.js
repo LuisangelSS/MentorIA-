@@ -15,6 +15,31 @@ function renderMarkdownToHtml(markdownText) {
   return sanitizedHtml;
 }
 
+async function ensureChatSession() {
+  if (window.currentChatSessionId) return window.currentChatSessionId;
+  const userToken = localStorage.getItem('userToken');
+  try {
+    const res = await fetch('/chats/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {})
+      },
+      body: JSON.stringify({})
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const newId = data.session?.id || null;
+    window.currentChatSessionId = newId;
+    if (window.refreshChatSessionsList) {
+      try { await window.refreshChatSessionsList(); } catch {}
+    }
+    return newId;
+  } catch {
+    return null;
+  }
+}
+
 button.addEventListener("click", async (e) => {
   e.preventDefault();
   const prompt = input.value.trim();
@@ -36,6 +61,11 @@ button.addEventListener("click", async (e) => {
 
   try {
     const userToken = localStorage.getItem('userToken');
+
+    // Asegurar sesión activa antes de enviar si no hay ninguna
+    if (!window.currentChatSessionId) {
+      await ensureChatSession();
+    }
 
     // Crear elemento para la respuesta del bot
     const botMsg = document.createElement("div");

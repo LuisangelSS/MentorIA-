@@ -7,6 +7,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Manejar el formulario de login
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+    // Toggle mostrar/ocultar contraseña
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const iconShow = document.getElementById('iconShow');
+    const iconHide = document.getElementById('iconHide');
+
+    if (togglePasswordBtn && passwordInput && iconShow && iconHide) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            if (isHidden) {
+                iconShow.classList.add('hidden');
+                iconHide.classList.remove('hidden');
+            } else {
+                iconHide.classList.add('hidden');
+                iconShow.classList.remove('hidden');
+            }
+        });
+    }
 });
 
 async function handleLogin(e) {

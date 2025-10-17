@@ -45,7 +45,17 @@
 
                     <label class="font-bold mb-8" for="password">
                         Contraseña
-                        <input type="password" name="password" id="password" placeholder="Tu contraseña" class="mt-1 p-3 bg-background rounded-lg border text-text w-full" required />
+                        <div class="mt-1 flex items-center gap-2">
+                            <input type="password" name="password" id="password" placeholder="Tu contraseña" class="p-3 bg-background rounded-lg border text-text w-full" required />
+                            <button type="button" id="togglePassword" aria-label="Mostrar u ocultar contraseña" class="p-2 rounded-md text-accent hover:text-[#7b82d9] border border-transparent hover:border-accent">
+                                <svg id="iconShow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                    <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                </svg>
+                                <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 hidden">
+                                    <path d="M3.27 2L2 3.27 5.11 6.4C3 8 2 12 12 12c1.01 0 1.93-.09 2.79-.24l1.73 1.73C15.39 13.83 13.79 14 12 14 5 14 2 7 2 7s.73-1.73 2.27-3.27zM21.19 21.19L19.73 22 17.5 19.77C15.79 20.57 13.96 21 12 21 5 21 2 14 2 14s1.23-2.91 3.73-5.41l-1.6-1.6C2.73 8.27 2 10 2 10s3 7 10 7c1.52 0 2.94-.22 4.25-.6l2.94 2.94z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </label>
 
                     <button type="submit" id="submitBtn" class="hover:cursor-pointer hover:bg-gray-300 p-3 bg-secondary text-text font-black text-xl rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">Iniciar Sesión</button>

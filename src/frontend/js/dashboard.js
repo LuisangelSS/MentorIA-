@@ -75,8 +75,10 @@ function createDifficultyChart(data) {
   // Crear mapa de dificultades desde los datos del backend
   const difficultyMap = {};
   difficultyDistribution.forEach(item => {
-    const normalizedDiff = item.difficulty ? item.difficulty.toLowerCase().trim() : 'intermedio';
-    difficultyMap[normalizedDiff] = item.count;
+    if (item.difficulty) {
+      const normalizedDiff = item.difficulty.toLowerCase().trim();
+      difficultyMap[normalizedDiff] = item.count;
+    }
   });
 
   // Mapear a las claves estándar

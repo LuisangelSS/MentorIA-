@@ -3,6 +3,7 @@
 <div align="center">
 
 ![MentorIA Banner](https://i.imgur.com/ZVw40XC.png)
+![MentorIA Banner](https://i.imgur.com/hA0vhl1.jpeg)
 
 [![Node.js](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev/)

@@ -1,63 +1,6 @@
-import Database from "better-sqlite3";
-import path from "path";
-import bcrypt from "bcryptjs";
-import { randomBytes } from "crypto";
-
-// Ruta de la base de datos
-const dbPath = path.join(process.cwd(), "mentoria.db");
-const db = new Database(dbPath);
-
-// Habilitar foreign keys
-db.pragma("foreign_keys = ON");
-
-// Crear tablas
-db.exec(`
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT 1
-);
-
-CREATE TABLE IF NOT EXISTS user_settings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    theme_mode TEXT DEFAULT 'light' CHECK(theme_mode IN ('light','dark')),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS user_sessions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    session_token TEXT UNIQUE NOT NULL,
-    expires_at DATETIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS chat_sessions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    session_name TEXT DEFAULT 'Nueva conversación',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS chat_messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    chat_session_id INTEGER NOT NULL,
-    role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(chat_session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
-);
-`);
+import { supabase } from './supabase.js';
+import bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
 
 // ----------------------------
 // FUNCIONES DE USUARIO
@@ -74,60 +17,111 @@ export function verifyPassword(password, hash) {
 }
 
 // Registrar nuevo usuario
-export function registerUser(username, email, password) {
+export async function registerUser(username, email, password) {
     const passwordHash = hashPassword(password);
-    const stmt = db.prepare(`INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)`);
-    const info = stmt.run(username, email, passwordHash);
+    
+    const { data, error } = await supabase
+        .from('users')
+        .insert([
+            {
+                username,
+                email,
+                password_hash: passwordHash
+            }
+        ])
+        .select('id')
+        .single();
+
+    if (error) throw error;
 
     // Crear configuración por defecto
-    const settingsStmt = db.prepare(`INSERT INTO user_settings (user_id) VALUES (?)`);
-    settingsStmt.run(info.lastInsertRowid);
+    await supabase
+        .from('user_settings')
+        .insert([{ user_id: data.id }]);
 
-    return info.lastInsertRowid;
+    return data.id;
 }
 
 // Buscar usuario por email
-export function findUserByEmail(email) {
-    const stmt = db.prepare(`SELECT * FROM users WHERE email = ? AND is_active = 1`);
-    return stmt.get(email);
+export async function findUserByEmail(email) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .eq('is_active', true)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
 }
 
 // Buscar usuario por id
-export function findUserById(id) {
-    const stmt = db.prepare(`
-        SELECT u.id, u.username, u.email, u.created_at, u.updated_at, u.is_active,
-               us.theme_mode
-        FROM users u
-        LEFT JOIN user_settings us ON u.id = us.user_id
-        WHERE u.id = ? AND u.is_active = 1
-    `);
-    return stmt.get(id);
+export async function findUserById(id) {
+    const { data, error } = await supabase
+        .from('users')
+        .select(`
+            id, username, email, created_at, updated_at, is_active,
+            user_settings(theme_mode)
+        `)
+        .eq('id', id)
+        .eq('is_active', true)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
 }
 
 // Crear sesión
-export function createSession(userId, durationHours = 24) {
+export async function createSession(userId, durationHours = 24) {
     const token = randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + durationHours * 3600 * 1000).toISOString();
-    const stmt = db.prepare(`INSERT INTO user_sessions (user_id, session_token, expires_at) VALUES (?, ?, ?)`);
-    stmt.run(userId, token, expiresAt);
+    
+    const { error } = await supabase
+        .from('user_sessions')
+        .insert([{
+            user_id: userId,
+            session_token: token,
+            expires_at: expiresAt
+        }]);
+
+    if (error) throw error;
     return { token, expiresAt };
 }
 
 // Validar sesión
-export function validateSession(token) {
-    const stmt = db.prepare(`
-        SELECT us.session_token, us.expires_at, u.id AS user_id, u.username, u.email
-        FROM user_sessions us
-        JOIN users u ON us.user_id = u.id
-        WHERE us.session_token = ? AND us.expires_at > CURRENT_TIMESTAMP AND u.is_active = 1
-    `);
-    return stmt.get(token);
+export async function validateSession(token) {
+    const { data, error } = await supabase
+        .from('user_sessions')
+        .select(`
+            session_token, expires_at,
+            users!inner(id, username, email)
+        `)
+        .eq('session_token', token)
+        .gt('expires_at', new Date().toISOString())
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    
+    if (data) {
+        return {
+            session_token: data.session_token,
+            expires_at: data.expires_at,
+            user_id: data.users.id,
+            username: data.users.username,
+            email: data.users.email
+        };
+    }
+    return null;
 }
 
 // Eliminar sesión (logout)
-export function deleteSession(token) {
-    const stmt = db.prepare(`DELETE FROM user_sessions WHERE session_token = ?`);
-    stmt.run(token);
+export async function deleteSession(token) {
+    const { error } = await supabase
+        .from('user_sessions')
+        .delete()
+        .eq('session_token', token);
+
+    if (error) throw error;
 }
 
 // ----------------------------
@@ -135,150 +129,188 @@ export function deleteSession(token) {
 // ----------------------------
 
 // Actualizar nombre de usuario
-export function updateUsername(userId, newUsername) {
+export async function updateUsername(userId, newUsername) {
     // Verificar que el username no esté en uso
-    const checkStmt = db.prepare(`SELECT id FROM users WHERE username = ? AND id != ?`);
-    const existing = checkStmt.get(newUsername, userId);
+    const { data: existing } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', newUsername)
+        .neq('id', userId)
+        .single();
+
     if (existing) {
         throw new Error('El nombre de usuario ya está en uso');
     }
     
-    const stmt = db.prepare(`UPDATE users SET username = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-    const result = stmt.run(newUsername, userId);
-    return result.changes > 0;
+    const { error } = await supabase
+        .from('users')
+        .update({ username: newUsername })
+        .eq('id', userId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Actualizar email
-export function updateEmail(userId, newEmail) {
+export async function updateEmail(userId, newEmail) {
     // Verificar que el email no esté en uso
-    const checkStmt = db.prepare(`SELECT id FROM users WHERE email = ? AND id != ?`);
-    const existing = checkStmt.get(newEmail, userId);
+    const { data: existing } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', newEmail)
+        .neq('id', userId)
+        .single();
+
     if (existing) {
         throw new Error('El email ya está en uso');
     }
     
-    const stmt = db.prepare(`UPDATE users SET email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-    const result = stmt.run(newEmail, userId);
-    return result.changes > 0;
+    const { error } = await supabase
+        .from('users')
+        .update({ email: newEmail })
+        .eq('id', userId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Actualizar contraseña
-export function updatePassword(userId, newPassword) {
+export async function updatePassword(userId, newPassword) {
     const passwordHash = hashPassword(newPassword);
-    const stmt = db.prepare(`UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-    const result = stmt.run(passwordHash, userId);
-    return result.changes > 0;
+    
+    const { error } = await supabase
+        .from('users')
+        .update({ password_hash: passwordHash })
+        .eq('id', userId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Verificar contraseña actual del usuario
-export function verifyCurrentPassword(userId, currentPassword) {
-    const stmt = db.prepare(`SELECT password_hash FROM users WHERE id = ?`);
-    const user = stmt.get(userId);
-    if (!user) return false;
-    return verifyPassword(currentPassword, user.password_hash);
+export async function verifyCurrentPassword(userId, currentPassword) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('password_hash')
+        .eq('id', userId)
+        .single();
+
+    if (error) throw error;
+    if (!data) return false;
+    
+    return verifyPassword(currentPassword, data.password_hash);
 }
-
-// ----------------------------
-// TABLAS PARA QUIZZES Y PROGRESO
-// ----------------------------
-
-db.exec(`
-CREATE TABLE IF NOT EXISTS quizzes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    topic TEXT NOT NULL,
-    difficulty TEXT,
-    questions_json TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS quiz_attempts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    quiz_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
-    answers_json TEXT NOT NULL,
-    score INTEGER NOT NULL,
-    total INTEGER NOT NULL,
-    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-`);
 
 // ----------------------------
 // FUNCIONES PARA QUIZZES
 // ----------------------------
 
-export function createQuiz(userId, topic, difficulty, questions) {
-    const stmt = db.prepare(`
-        INSERT INTO quizzes (user_id, topic, difficulty, questions_json)
-        VALUES (?, ?, ?, ?)
-    `);
-    const info = stmt.run(userId, topic, difficulty || null, JSON.stringify(questions));
-    return info.lastInsertRowid;
+export async function createQuiz(userId, topic, difficulty, questions) {
+    const { data, error } = await supabase
+        .from('quizzes')
+        .insert([{
+            user_id: userId,
+            topic,
+            difficulty,
+            questions_json: JSON.stringify(questions)
+        }])
+        .select('id')
+        .single();
+
+    if (error) throw error;
+    return data.id;
 }
 
-export function getRecentQuizzes(userId, limit = 8) {
-    const stmt = db.prepare(`
-        SELECT id, topic, difficulty, created_at
-        FROM quizzes
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT ?
-    `);
-    return stmt.all(userId, limit);
+export async function getRecentQuizzes(userId, limit = 8) {
+    const { data, error } = await supabase
+        .from('quizzes')
+        .select('id, topic, difficulty, created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }
 
-export function getQuizById(quizId, userId) {
-    const stmt = db.prepare(`
-        SELECT id, user_id, topic, difficulty, questions_json, created_at
-        FROM quizzes
-        WHERE id = ? AND user_id = ?
-    `);
-    return stmt.get(quizId, userId);
+export async function getQuizById(quizId, userId) {
+    const { data, error } = await supabase
+        .from('quizzes')
+        .select('id, user_id, topic, difficulty, questions_json, created_at')
+        .eq('id', quizId)
+        .eq('user_id', userId)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
 }
 
-export function recordQuizAttempt(quizId, userId, answers, score, total) {
-    const stmt = db.prepare(`
-        INSERT INTO quiz_attempts (quiz_id, user_id, answers_json, score, total)
-        VALUES (?, ?, ?, ?, ?)
-    `);
-    const info = stmt.run(quizId, userId, JSON.stringify(answers), score, total);
-    return info.lastInsertRowid;
+export async function recordQuizAttempt(quizId, userId, answers, score, total) {
+    const { data, error } = await supabase
+        .from('quiz_attempts')
+        .insert([{
+            quiz_id: quizId,
+            user_id: userId,
+            answers_json: answers,
+            score,
+            total
+        }])
+        .select('id')
+        .single();
+
+    if (error) throw error;
+    return data.id;
 }
 
-export function getProgressSummary(userId) {
-    const totals = db.prepare(`
-        SELECT
-          (SELECT COUNT(*) FROM quizzes WHERE user_id = ?) AS quizzes_count,
-          (SELECT COUNT(*) FROM quiz_attempts WHERE user_id = ?) AS attempts_count,
-          (SELECT COALESCE(ROUND(AVG(100.0 * score / total), 2), 0) FROM quiz_attempts WHERE user_id = ?) AS avg_score
-    `).get(userId, userId, userId);
+export async function getProgressSummary(userId) {
+    // Obtener conteos
+    const { data: quizzes } = await supabase
+        .from('quizzes')
+        .select('id', { count: 'exact' })
+        .eq('user_id', userId);
 
-    // Obtener todos los intentos recientes (sin límite) con dificultad
-    const recentAttempts = db.prepare(`
-        SELECT qa.id, qa.quiz_id, q.topic, q.difficulty, qa.score, qa.total, qa.completed_at
-        FROM quiz_attempts qa
-        JOIN quizzes q ON qa.quiz_id = q.id
-        WHERE qa.user_id = ?
-        ORDER BY qa.completed_at DESC
-    `).all(userId);
+    const { data: attempts } = await supabase
+        .from('quiz_attempts')
+        .select('id', { count: 'exact' })
+        .eq('user_id', userId);
 
-    // Obtener distribución de dificultad de todos los quizzes generados
-    const difficultyDistribution = db.prepare(`
-        SELECT 
-          difficulty,
-          COUNT(*) as count
-        FROM quizzes 
-        WHERE user_id = ?
-        GROUP BY difficulty
-    `).all(userId);
+    // Obtener puntaje promedio
+    const { data: avgScore } = await supabase
+        .from('quiz_attempts')
+        .select('score, total')
+        .eq('user_id', userId);
 
-    return { 
-        ...totals, 
-        recentAttempts,
-        difficultyDistribution 
+    const avg = avgScore && avgScore.length > 0 
+        ? avgScore.reduce((sum, attempt) => sum + (attempt.score / attempt.total), 0) / avgScore.length * 100
+        : 0;
+
+    // Obtener intentos recientes
+    const { data: recentAttempts } = await supabase
+        .from('quiz_attempts')
+        .select(`
+            id, quiz_id, score, total, completed_at,
+            quizzes!inner(topic, difficulty)
+        `)
+        .eq('user_id', userId)
+        .order('completed_at', { ascending: false });
+
+    // Obtener distribución de dificultad
+    const { data: difficultyDistribution } = await supabase
+        .from('quizzes')
+        .select('difficulty')
+        .eq('user_id', userId);
+
+    const distribution = {};
+    difficultyDistribution?.forEach(quiz => {
+        distribution[quiz.difficulty] = (distribution[quiz.difficulty] || 0) + 1;
+    });
+
+    return {
+        quizzes_count: quizzes?.length || 0,
+        attempts_count: attempts?.length || 0,
+        avg_score: Math.round(avg * 100) / 100,
+        recentAttempts: recentAttempts || [],
+        difficultyDistribution: Object.entries(distribution).map(([difficulty, count]) => ({ difficulty, count }))
     };
 }
 
@@ -287,126 +319,173 @@ export function getProgressSummary(userId) {
 // ----------------------------
 
 // Crear nueva sesión de chat
-export function createChatSession(userId, sessionName = 'Nueva conversación') {
-    const stmt = db.prepare(`INSERT INTO chat_sessions (user_id, session_name) VALUES (?, ?)`);
-    const info = stmt.run(userId, sessionName);
-    return info.lastInsertRowid;
+export async function createChatSession(userId, sessionName = 'Nueva conversación') {
+    const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert([{
+            user_id: userId,
+            session_name: sessionName
+        }])
+        .select('id')
+        .single();
+
+    if (error) throw error;
+    return data.id;
 }
 
 // Obtener sesión de chat activa del usuario (la más reciente)
-export function getActiveChatSession(userId) {
-    const stmt = db.prepare(`
-        SELECT id, session_name, created_at, updated_at 
-        FROM chat_sessions 
-        WHERE user_id = ? 
-        ORDER BY updated_at DESC 
-        LIMIT 1
-    `);
-    return stmt.get(userId);
+export async function getActiveChatSession(userId) {
+    const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('id, session_name, created_at, updated_at')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
 }
 
 // Crear o obtener sesión de chat activa
-export function getOrCreateActiveChatSession(userId) {
-    let session = getActiveChatSession(userId);
+export async function getOrCreateActiveChatSession(userId) {
+    let session = await getActiveChatSession(userId);
     if (!session) {
-        const sessionId = createChatSession(userId);
+        const sessionId = await createChatSession(userId);
         session = { id: sessionId, session_name: 'Nueva conversación' };
     }
     return session;
 }
 
 // Agregar mensaje a la sesión de chat
-export function addChatMessage(chatSessionId, role, content) {
-    const stmt = db.prepare(`INSERT INTO chat_messages (chat_session_id, role, content) VALUES (?, ?, ?)`);
-    const info = stmt.run(chatSessionId, role, content);
-    
+export async function addChatMessage(chatSessionId, role, content) {
+    const { error } = await supabase
+        .from('chat_messages')
+        .insert([{
+            chat_session_id: chatSessionId,
+            role,
+            content
+        }]);
+
+    if (error) throw error;
+
     // Actualizar timestamp de la sesión
-    const updateStmt = db.prepare(`UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-    updateStmt.run(chatSessionId);
-    
-    return info.lastInsertRowid;
+    await supabase
+        .from('chat_sessions')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', chatSessionId);
+
+    return true;
 }
 
 // Obtener historial de mensajes de una sesión (últimos N mensajes)
-export function getChatHistory(chatSessionId, limit = 20) {
-    const stmt = db.prepare(`
-        SELECT role, content, created_at 
-        FROM chat_messages 
-        WHERE chat_session_id = ? 
-        ORDER BY created_at DESC 
-        LIMIT ?
-    `);
-    return stmt.all(chatSessionId, limit).reverse(); // Invertir para orden cronológico
+export async function getChatHistory(chatSessionId, limit = 20) {
+    const { data, error } = await supabase
+        .from('chat_messages')
+        .select('role, content, created_at')
+        .eq('chat_session_id', chatSessionId)
+        .order('created_at', { ascending: true })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }
 
 // Obtener historial de mensajes del usuario activo
-export function getUserChatHistory(userId, limit = 20) {
-    const session = getActiveChatSession(userId);
+export async function getUserChatHistory(userId, limit = 20) {
+    const session = await getActiveChatSession(userId);
     if (!session) return [];
-    return getChatHistory(session.id, limit);
+    return await getChatHistory(session.id, limit);
 }
 
 // Limpiar historial de una sesión
-export function clearChatHistory(chatSessionId) {
-    const stmt = db.prepare(`DELETE FROM chat_messages WHERE chat_session_id = ?`);
-    return stmt.run(chatSessionId);
+export async function clearChatHistory(chatSessionId) {
+    const { error } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('chat_session_id', chatSessionId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Obtener todas las sesiones de chat del usuario
-export function getUserChatSessions(userId) {
-    const stmt = db.prepare(`
-        SELECT id, session_name, created_at, updated_at,
-               (SELECT COUNT(*) FROM chat_messages WHERE chat_session_id = chat_sessions.id) as message_count
-        FROM chat_sessions 
-        WHERE user_id = ? 
-        ORDER BY updated_at DESC
-    `);
-    return stmt.all(userId);
+export async function getUserChatSessions(userId) {
+    const { data, error } = await supabase
+        .from('chat_sessions')
+        .select(`
+            id, session_name, created_at, updated_at,
+            chat_messages(count)
+        `)
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    
+    return data?.map(session => ({
+        ...session,
+        message_count: session.chat_messages?.[0]?.count || 0
+    })) || [];
 }
 
 // Obtener una sesión específica asegurando pertenencia del usuario
-export function getChatSessionById(userId, sessionId) {
-    const stmt = db.prepare(`
-        SELECT id, user_id, session_name, created_at, updated_at
-        FROM chat_sessions
-        WHERE id = ? AND user_id = ?
-    `);
-    return stmt.get(sessionId, userId);
+export async function getChatSessionById(userId, sessionId) {
+    const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('id, user_id, session_name, created_at, updated_at')
+        .eq('id', sessionId)
+        .eq('user_id', userId)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
 }
 
 // Actualizar nombre de una sesión de chat
-export function updateChatSessionName(sessionId, newName) {
+export async function updateChatSessionName(sessionId, newName) {
     const safeName = (newName || '').toString().trim().slice(0, 80);
-    const stmt = db.prepare(`UPDATE chat_sessions SET session_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-    const info = stmt.run(safeName.length ? safeName : 'Nueva conversación', sessionId);
-    return info.changes > 0;
+    
+    const { error } = await supabase
+        .from('chat_sessions')
+        .update({ 
+            session_name: safeName.length ? safeName : 'Nueva conversación'
+        })
+        .eq('id', sessionId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Eliminar una sesión de chat específica (incluye todos sus mensajes por CASCADE)
-export function deleteChatSession(userId, sessionId) {
-    const stmt = db.prepare(`DELETE FROM chat_sessions WHERE id = ? AND user_id = ?`);
-    const result = stmt.run(sessionId, userId);
-    return result.changes > 0;
+export async function deleteChatSession(userId, sessionId) {
+    const { error } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('id', sessionId)
+        .eq('user_id', userId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Eliminar todas las sesiones de chat de un usuario
-export function deleteAllUserChatSessions(userId) {
-    const stmt = db.prepare(`DELETE FROM chat_sessions WHERE user_id = ?`);
-    const result = stmt.run(userId);
-    return result.changes;
+export async function deleteAllUserChatSessions(userId) {
+    const { error } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('user_id', userId);
+
+    if (error) throw error;
+    return true;
 }
 
 // Eliminar todos los datos del usuario (chats, quizzes, intentos, etc.)
-export function deleteAllUserData(userId) {
-    // Las foreign keys con CASCADE se encargan de eliminar automáticamente:
-    // - chat_sessions -> chat_messages
-    // - quizzes -> quiz_attempts
-    // - user_sessions
-    // - user_settings
-    
-    const stmt = db.prepare(`DELETE FROM users WHERE id = ?`);
-    const result = stmt.run(userId);
-    return result.changes > 0;
-}
+export async function deleteAllUserData(userId) {
+    const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
 
-export default db;
+    if (error) throw error;
+    return true;
+}

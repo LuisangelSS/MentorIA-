@@ -110,14 +110,14 @@ app.get('/dashboard', (req, res) => {
 // -----------------------------
 // Endpoints de usuario / sesión
 // -----------------------------
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
         return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
     try {
-        const userId = registerUser(username, email, password);
+        const userId = await registerUser(username, email, password);
         res.json({ message: "Usuario registrado correctamente", userId });
     } catch (error) {
         console.error(error);
@@ -125,37 +125,37 @@ app.post("/register", (req, res) => {
     }
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Faltan campos obligatorios" });
 
-    const user = findUserByEmail(email);
+    const user = await findUserByEmail(email);
     if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
 
     if (!verifyPassword(password, user.password_hash)) {
         return res.status(401).json({ error: "Contraseña incorrecta" });
     }
 
-    const session = createSession(user.id, 24); // token válido por 24 horas
+    const session = await createSession(user.id, 24); // token válido por 24 horas
     res.json({ token: session.token, expiresAt: session.expiresAt });
 });
 
-app.post("/logout", (req, res) => {
+app.post("/logout", async (req, res) => {
     const { token } = req.body;
     if (!token) return res.status(400).json({ error: "Falta token de sesión" });
 
-    deleteSession(token);
+    await deleteSession(token);
     res.json({ message: "Logout exitoso" });
 });
 
 // Endpoint para obtener información del usuario autenticado
-app.get("/user-info", (req, res) => {
+app.get("/user-info", async (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
         return res.status(401).json({ error: "Token de autorización requerido" });
     }
 
-    const session = validateSession(token);
+    const session = await validateSession(token);
     if (!session) {
         return res.status(401).json({ error: "Token inválido o expirado" });
     }
@@ -173,13 +173,13 @@ app.get("/user-info", (req, res) => {
 // -----------------------------
 
 // Middleware para validar token
-function validateToken(req, res, next) {
+async function validateToken(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
         return res.status(401).json({ error: "Token de autorización requerido" });
     }
 
-    const session = validateSession(token);
+    const session = await validateSession(token);
     if (!session) {
         return res.status(401).json({ error: "Token inválido o expirado" });
     }
@@ -189,7 +189,7 @@ function validateToken(req, res, next) {
 }
 
 // Actualizar nombre de usuario
-app.put("/profile/username", validateToken, (req, res) => {
+app.put("/profile/username", validateToken, async (req, res) => {
     const { newUsername } = req.body;
 
     if (!newUsername || newUsername.trim().length < 3) {
@@ -197,7 +197,7 @@ app.put("/profile/username", validateToken, (req, res) => {
     }
 
     try {
-        const success = updateUsername(req.user.user_id, newUsername.trim());
+        const success = await updateUsername(req.user.user_id, newUsername.trim());
         if (success) {
             res.json({ message: "Nombre de usuario actualizado correctamente" });
         } else {
@@ -209,7 +209,7 @@ app.put("/profile/username", validateToken, (req, res) => {
 });
 
 // Actualizar email
-app.put("/profile/email", validateToken, (req, res) => {
+app.put("/profile/email", validateToken, async (req, res) => {
     const { newEmail } = req.body;
 
     // Validación básica de email
@@ -219,7 +219,7 @@ app.put("/profile/email", validateToken, (req, res) => {
     }
 
     try {
-        const success = updateEmail(req.user.user_id, newEmail.toLowerCase().trim());
+        const success = await updateEmail(req.user.user_id, newEmail.toLowerCase().trim());
         if (success) {
             res.json({ message: "Email actualizado correctamente" });
         } else {
@@ -231,7 +231,7 @@ app.put("/profile/email", validateToken, (req, res) => {
 });
 
 // Actualizar contraseña
-app.put("/profile/password", validateToken, (req, res) => {
+app.put("/profile/password", validateToken, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -244,12 +244,12 @@ app.put("/profile/password", validateToken, (req, res) => {
 
     try {
         // Verificar contraseña actual
-        const isCurrentPasswordValid = verifyCurrentPassword(req.user.user_id, currentPassword);
+        const isCurrentPasswordValid = await verifyCurrentPassword(req.user.user_id, currentPassword);
         if (!isCurrentPasswordValid) {
             return res.status(401).json({ error: "Contraseña actual incorrecta" });
         }
 
-        const success = updatePassword(req.user.user_id, newPassword);
+        const success = await updatePassword(req.user.user_id, newPassword);
         if (success) {
             res.json({ message: "Contraseña actualizada correctamente" });
         } else {
@@ -261,7 +261,7 @@ app.put("/profile/password", validateToken, (req, res) => {
 });
 
 // Actualizar perfil completo (múltiples campos)
-app.put("/profile/update-all", validateToken, (req, res) => {
+app.put("/profile/update-all", validateToken, async (req, res) => {
     const { newUsername, newEmail, currentPassword, newPassword } = req.body;
     const userId = req.user.user_id;
     const errors = [];
@@ -274,7 +274,7 @@ app.put("/profile/update-all", validateToken, (req, res) => {
                 errors.push("El nombre de usuario debe tener al menos 3 caracteres");
             } else {
                 try {
-                    const success = updateUsername(userId, newUsername.trim());
+                    const success = await updateUsername(userId, newUsername.trim());
                     if (success) {
                         updates.push("nombre de usuario");
                     }
@@ -291,7 +291,7 @@ app.put("/profile/update-all", validateToken, (req, res) => {
                 errors.push("Email inválido");
             } else {
                 try {
-                    const success = updateEmail(userId, newEmail.toLowerCase().trim());
+                    const success = await updateEmail(userId, newEmail.toLowerCase().trim());
                     if (success) {
                         updates.push("email");
                     }
@@ -309,11 +309,11 @@ app.put("/profile/update-all", validateToken, (req, res) => {
                 errors.push("La nueva contraseña debe tener al menos 6 caracteres");
             } else {
                 // Verificar contraseña actual
-                const isCurrentPasswordValid = verifyCurrentPassword(userId, currentPassword);
+                const isCurrentPasswordValid = await verifyCurrentPassword(userId, currentPassword);
                 if (!isCurrentPasswordValid) {
                     errors.push("Contraseña actual incorrecta");
                 } else {
-                    const success = updatePassword(userId, newPassword);
+                    const success = await updatePassword(userId, newPassword);
                     if (success) {
                         updates.push("contraseña");
                     }
@@ -362,17 +362,17 @@ app.post("/chat", validateToken, async (req, res) => {
         // Resolver sesión de chat a usar
         let chatSession = null;
         if (chatSessionId) {
-            const owned = getChatSessionById(userId, chatSessionId);
+            const owned = await getChatSessionById(userId, chatSessionId);
             if (!owned) return res.status(404).json({ error: "Sesión de chat no encontrada" });
             chatSession = owned;
         } else {
-            chatSession = getOrCreateActiveChatSession(userId);
+            chatSession = await getOrCreateActiveChatSession(userId);
         }
 
         // Historial (últimos 10)
         let chatHistory = [];
         if (chatSession) {
-            chatHistory = getChatHistory(chatSession.id, 10);
+            chatHistory = await getChatHistory(chatSession.id, 10);
         }
 
         // Construir el array de contenidos con el historial
@@ -489,8 +489,8 @@ app.post("/chat", validateToken, async (req, res) => {
 
                 // Guardar mensajes en la base de datos
                 if (chatSession) {
-                    addChatMessage(chatSession.id, 'user', prompt);
-                    addChatMessage(chatSession.id, 'assistant', fullResponse);
+                    await addChatMessage(chatSession.id, 'user', prompt);
+                    await addChatMessage(chatSession.id, 'assistant', fullResponse);
                 }
 
                 // Autonombrar la sesión si aún tiene el nombre por defecto
@@ -498,7 +498,7 @@ app.post("/chat", validateToken, async (req, res) => {
                     if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
                         const title = await generateChatTitle(prompt, fullResponse);
                         if (title) {
-                            updateChatSessionName(chatSession.id, title);
+                            await updateChatSessionName(chatSession.id, title);
                             chatSession.session_name = title;
                         }
                     }
@@ -527,8 +527,8 @@ app.post("/chat", validateToken, async (req, res) => {
 
             // Guardar mensajes en la base de datos
             if (chatSession) {
-                addChatMessage(chatSession.id, 'user', prompt);
-                addChatMessage(chatSession.id, 'assistant', rawReply);
+                await addChatMessage(chatSession.id, 'user', prompt);
+                await addChatMessage(chatSession.id, 'assistant', rawReply);
             }
 
             // Autonombrar la sesión si aún tiene el nombre por defecto
@@ -536,7 +536,7 @@ app.post("/chat", validateToken, async (req, res) => {
                 if (chatSession && (!chatSession.session_name || /^Nueva convers/i.test(chatSession.session_name))) {
                     const title = await generateChatTitle(prompt, rawReply);
                     if (title) {
-                        updateChatSessionName(chatSession.id, title);
+                        await updateChatSessionName(chatSession.id, title);
                         chatSession.session_name = title;
                     }
                 }
@@ -687,55 +687,53 @@ async function generateChatTitle(userPrompt, rawAssistantReply) {
 // -----------------------------
 
 // Listar sesiones del usuario
-app.get("/chats/sessions", validateToken, (req, res) => {
+app.get("/chats/sessions", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const sessions = getUserChatSessions(userId);
+  const sessions = await getUserChatSessions(userId);
   res.json({ sessions });
 });
 
 // Crear nueva sesión
-app.post("/chats/sessions", validateToken, (req, res) => {
+app.post("/chats/sessions", validateToken, async (req, res) => {
   const userId = req.user.user_id;
   const { name } = req.body || {};
-  const id = createChatSession(userId, (name && name.trim()) || undefined);
-  const session = getChatSessionById(userId, id);
+  const id = await createChatSession(userId, (name && name.trim()) || undefined);
+  const session = await getChatSessionById(userId, id);
   res.json({ session });
 });
 
 // Obtener mensajes de una sesión
-app.get("/chats/:sessionId/messages", validateToken, (req, res) => {
+app.get("/chats/:sessionId/messages", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const sessionId = parseInt(req.params.sessionId, 10);
-  if (Number.isNaN(sessionId)) return res.status(400).json({ error: "ID inválido" });
-  const session = getChatSessionById(userId, sessionId);
+  const sessionId = req.params.sessionId; // Supabase usa UUIDs, no necesitamos parseInt
+  const session = await getChatSessionById(userId, sessionId);
   if (!session) return res.status(404).json({ error: "Sesión no encontrada" });
-  const messages = getChatHistory(sessionId, 100);
+  const messages = await getChatHistory(sessionId, 100);
   res.json({ session, messages });
 });
 
 // Eliminar una sesión de chat específica
-app.delete("/chats/:sessionId", validateToken, (req, res) => {
+app.delete("/chats/:sessionId", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const sessionId = parseInt(req.params.sessionId, 10);
-  if (Number.isNaN(sessionId)) return res.status(400).json({ error: "ID inválido" });
+  const sessionId = req.params.sessionId; // Supabase usa UUIDs, no necesitamos parseInt
   
-  const success = deleteChatSession(userId, sessionId);
+  const success = await deleteChatSession(userId, sessionId);
   if (!success) return res.status(404).json({ error: "Sesión no encontrada" });
   
   res.json({ message: "Sesión eliminada correctamente" });
 });
 
 // Eliminar todas las conversaciones del usuario
-app.delete("/chats", validateToken, (req, res) => {
+app.delete("/chats", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const deletedCount = deleteAllUserChatSessions(userId);
+  const deletedCount = await deleteAllUserChatSessions(userId);
   res.json({ message: `${deletedCount} conversaciones eliminadas correctamente` });
 });
 
 // Eliminar todos los datos del usuario (cuenta completa)
-app.delete("/user/delete-account", validateToken, (req, res) => {
+app.delete("/user/delete-account", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const success = deleteAllUserData(userId);
+  const success = await deleteAllUserData(userId);
   if (!success) return res.status(500).json({ error: "Error al eliminar la cuenta" });
   
   res.json({ message: "Cuenta eliminada correctamente" });
@@ -793,15 +791,18 @@ app.post("/quizzes/generate", validateToken, async (req, res) => {
     const raw = response?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!raw) return res.status(500).json({ error: "Respuesta vacía del modelo" });
 
+    console.log('Respuesta raw del modelo:', raw);
     const parsed = tryParseQuiz(raw);
+    console.log('Quiz parseado:', parsed);
     if (!parsed) {
       return res.status(500).json({ error: "No se pudo parsear JSON del modelo" });
     }
 
     const normalized = normalizeQuizSchema(parsed, { topic, difficulty: normalizedDifficulty });
+    console.log('Quiz normalizado:', normalized);
 
     // Guardar en BD con preguntas normalizadas
-    const quizId = createQuiz(userId, normalized.topic, normalizedDifficulty, normalized.questions);
+    const quizId = await createQuiz(userId, normalized.topic, normalizedDifficulty, normalized.questions);
 
     res.json({ quizId, quiz: { id: quizId, ...normalized } });
   } catch (error) {
@@ -811,37 +812,56 @@ app.post("/quizzes/generate", validateToken, async (req, res) => {
 });
 
 // Listar quizzes recientes del usuario
-app.get("/quizzes/recent", validateToken, (req, res) => {
+app.get("/quizzes/recent", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const items = getRecentQuizzes(userId, 12);
+  const items = await getRecentQuizzes(userId, 12);
   res.json({ items });
 });
 
 // Obtener un quiz específico del usuario
-app.get("/quizzes/:id", validateToken, (req, res) => {
+app.get("/quizzes/:id", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const quizId = parseInt(req.params.id, 10);
-  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
+  const quizId = req.params.id; // Supabase usa UUIDs, no necesitamos parseInt
 
-  const row = getQuizById(quizId, userId);
+  const row = await getQuizById(quizId, userId);
   if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
 
+  console.log('Quiz desde BD:', row);
+  console.log('questions_json raw:', row.questions_json);
+  console.log('Tipo de questions_json:', typeof row.questions_json);
+  
   let questions;
-  try { questions = JSON.parse(row.questions_json); } catch { questions = []; }
+  if (typeof row.questions_json === 'string') {
+    // Si es string, parsearlo
+    try { 
+      questions = JSON.parse(row.questions_json); 
+      console.log('Preguntas parseadas desde BD (string):', questions);
+    } catch (e) { 
+      console.error('Error parseando questions_json:', e);
+      questions = []; 
+    }
+  } else if (Array.isArray(row.questions_json)) {
+    // Si ya es un array, usarlo directamente
+    questions = row.questions_json;
+    console.log('Preguntas desde BD (ya es array):', questions);
+  } else {
+    // Si es null, undefined, o cualquier otra cosa
+    questions = [];
+    console.log('questions_json es null/undefined, usando array vacío');
+  }
   res.json({ id: row.id, topic: row.topic, difficulty: row.difficulty, created_at: row.created_at, questions });
 });
 
 // Enviar intento de quiz y calcular puntaje
-app.post("/quizzes/:id/attempt", validateToken, (req, res) => {
+app.post("/quizzes/:id/attempt", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const quizId = parseInt(req.params.id, 10);
+  const quizId = req.params.id; // Supabase usa UUIDs, no necesitamos parseInt
   const { answers } = req.body; // array de indices seleccionados
-  if (Number.isNaN(quizId)) return res.status(400).json({ error: "ID inválido" });
   if (!Array.isArray(answers) || answers.length !== 10) {
     return res.status(400).json({ error: "Debes enviar 10 respuestas" });
   }
 
-  const row = getQuizById(quizId, userId);
+  const row = await getQuizById(quizId, userId);
   if (!row) return res.status(404).json({ error: "Quiz no encontrado" });
 
   let questions = [];
@@ -853,14 +873,14 @@ app.post("/quizzes/:id/attempt", validateToken, (req, res) => {
     if (typeof q.correctIndex === 'number' && answers[idx] === q.correctIndex) score += 1;
   });
 
-  const attemptId = recordQuizAttempt(quizId, userId, answers, score, total);
+  const attemptId = await recordQuizAttempt(quizId, userId, answers, score, total);
   res.json({ attemptId, score, total, percentage: Math.round((score/total)*100) });
 });
 
 // Resumen de progreso del usuario (para dashboard)
-app.get("/progress/summary", validateToken, (req, res) => {
+app.get("/progress/summary", validateToken, async (req, res) => {
   const userId = req.user.user_id;
-  const summary = getProgressSummary(userId);
+  const summary = await getProgressSummary(userId);
   res.json(summary);
 });
 

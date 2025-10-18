@@ -172,6 +172,21 @@
         </main>
         <script>
             AOS.init();
+            
+            // Manejar parámetro de sesión en la URL
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionId = urlParams.get('session');
+                
+                if (sessionId) {
+                    // Esperar a que chat-sessions.js esté cargado
+                    setTimeout(() => {
+                        if (window.openSession) {
+                            window.openSession(sessionId);
+                        }
+                    }, 100);
+                }
+            });
         </script>
     </body>
 </html>

@@ -5,6 +5,7 @@
   "main": "src/backend/server.js",
   "type": "module",
   "scripts": {
+    "migrate": "node migrate-to-supabase.js",
     "start": "node src/backend/server.js",
     "dev": "nodemon src/backend/server.js",
     "build-css": "npx @tailwindcss/cli@latest -i ./src/frontend/css/input.css -o ./src/frontend/css/style.css --watch",
@@ -13,8 +14,8 @@
   },
   "dependencies": {
     "@google/genai": "^1.21.0",
+    "@supabase/supabase-js": "^2.75.1",
     "bcryptjs": "^3.0.2",
-    "better-sqlite3": "^12.4.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",

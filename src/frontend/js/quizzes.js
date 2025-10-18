@@ -68,7 +68,12 @@ function renderInfo(text, type = 'info') {
 
 function renderQuiz(quizId, quiz, showBack = false) {
   const area = document.getElementById('quiz-area');
-  if (!area) return;
+  if (!area) {
+    console.error('Elemento quiz-area no encontrado');
+    return;
+  }
+  
+  console.log('Renderizando quiz:', quizId, quiz);
 
   const header = `
     <div class="bg-secondary p-4 rounded-lg mb-4">
@@ -108,6 +113,7 @@ ${showBack ? '<button id=\"back-to-quizzes\" class=\"p-2 rounded-lg bg-backgroun
   `;
 
   area.innerHTML = header + questionsHtml + submit;
+  console.log('Quiz renderizado en el área:', area.innerHTML.length, 'caracteres');
 
   document.getElementById('submit-quiz')?.addEventListener('click', async () => {
     const answers = [];

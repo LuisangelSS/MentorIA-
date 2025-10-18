@@ -144,9 +144,16 @@
     }
   }
 
-  async function openSession(sessionId) {
+  window.openSession = async function openSession(sessionId) {
     const userToken = localStorage.getItem('userToken');
     if (!userToken) return;
+    
+    // Si no estamos en la página de app, redirigir allí
+    if (!chatBox) {
+      window.location.href = `/app?session=${sessionId}`;
+      return;
+    }
+    
     try {
       const res = await fetch(`/chats/${sessionId}/messages`, {
         headers: { 'Authorization': `Bearer ${userToken}` }

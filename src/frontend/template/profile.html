@@ -89,27 +89,83 @@
                             </div>
 
                             <!-- Divider -->
-                            <div class="border-t border-text/20 pt-6">
-                                <h4 class="text-lg font-bold mb-4 text-text flex items-center">
-                                    <i class="bx bx-lock mr-2"></i>
-                                    Cambiar Contraseña (opcional)
-                                </h4>
-                                <p class="text-sm text-text-muted mb-4">Solo complete estos campos si desea cambiar su contraseña</p>
-                            </div>
+                            <div class="border-t border-text/20 my-6"></div>
 
                             <!-- Cambiar contraseña -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="currentPassword" class="block text-sm font-medium mb-2 text-text">Contraseña actual</label>
-                                    <input type="password" id="currentPassword" name="currentPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Solo si cambia contraseña" />
+                            <div class="space-y-4">
+                                <!-- Header de la sección -->
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                    <div>
+                                        <h4 class="text-lg font-bold text-text flex items-center">
+                                            <i class="bx bx-lock-alt mr-2 text-xl"></i>
+                                            Cambiar Contraseña (opcional)
+                                        </h4>
+                                        <p class="text-sm text-gray-400 mt-1">Solo complete estos campos si desea cambiar su contraseña</p>
+                                    </div>
+                                    <button type="button" id="toggleAllPasswords" aria-label="Mostrar u ocultar contraseñas" class="flex items-center gap-2 px-3 py-2 rounded-lg text-accent hover:text-[#7b82d9] border border-accent hover:bg-accent/10 transition-all duration-300 whitespace-nowrap">
+                                        <svg id="iconShowAll" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                            <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                        </svg>
+                                        <svg id="iconHideAll" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 hidden">
+                                            <path d="M3.27 2L2 3.27 5.11 6.4C3 8 2 12 12 12c1.01 0 1.93-.09 2.79-.24l1.73 1.73C15.39 13.83 13.79 14 12 14 5 14 2 7 2 7s.73-1.73 2.27-3.27zM21.19 21.19L19.73 22 17.5 19.77C15.79 20.57 13.96 21 12 21 5 21 2 14 2 14s1.23-2.91 3.73-5.41l-1.6-1.6C2.73 8.27 2 10 2 10s3 7 10 7c1.52 0 2.94-.22 4.25-.6l2.94 2.94z"/>
+                                        </svg>
+                                        <span class="text-sm font-semibold">Mostrar contraseñas</span>
+                                    </button>
                                 </div>
-                                <div>
-                                    <label for="newPassword" class="block text-sm font-medium mb-2 text-text">Nueva contraseña</label>
-                                    <input type="password" id="newPassword" name="newPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Mínimo 6 caracteres" minlength="6" />
-                                </div>
-                                <div>
-                                    <label for="confirmPassword" class="block text-sm font-medium mb-2 text-text">Confirmar contraseña</label>
-                                    <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-3 bg-secondary border border-text/30 rounded focus:border-text focus:outline-none text-text placeholder-text/50 transition-all duration-300" placeholder="Repetir nueva contraseña" minlength="6" />
+                                
+                                <!-- Campos de contraseña -->
+                                <div class="bg-secondary/50 p-4 rounded-lg border border-text/10">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <!-- Contraseña actual -->
+                                        <div class="space-y-2">
+                                            <label for="currentPassword" class="block text-sm font-semibold text-text flex items-center">
+                                                <i class="bx bx-key mr-1 text-accent"></i>
+                                                Contraseña actual
+                                            </label>
+                                            <input 
+                                                type="password" 
+                                                id="currentPassword" 
+                                                name="currentPassword" 
+                                                class="password-field w-full p-3 bg-background border border-text/20 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none text-text placeholder-gray-500 transition-all duration-300" 
+                                                placeholder="Tu contraseña actual" 
+                                            />
+                                        </div>
+                                        
+                                        <!-- Nueva contraseña -->
+                                        <div class="space-y-2">
+                                            <label for="newPassword" class="block text-sm font-semibold text-text flex items-center">
+                                                <i class="bx bx-lock mr-1 text-accent"></i>
+                                                Nueva contraseña
+                                            </label>
+                                            <input 
+                                                type="password" 
+                                                id="newPassword" 
+                                                name="newPassword" 
+                                                class="password-field w-full p-3 bg-background border border-text/20 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none text-text placeholder-gray-500 transition-all duration-300" 
+                                                placeholder="Mínimo 6 caracteres" 
+                                                minlength="6" 
+                                            />
+                                            <small id="passwordHelp" class="block text-xs text-gray-400 leading-tight">
+                                                Mínimo 6 caracteres, al menos 1 mayúscula, 1 minúscula y 1 número.
+                                            </small>
+                                        </div>
+                                        
+                                        <!-- Confirmar contraseña -->
+                                        <div class="space-y-2">
+                                            <label for="confirmPassword" class="block text-sm font-semibold text-text flex items-center">
+                                                <i class="bx bx-check-shield mr-1 text-accent"></i>
+                                                Confirmar contraseña
+                                            </label>
+                                            <input 
+                                                type="password" 
+                                                id="confirmPassword" 
+                                                name="confirmPassword" 
+                                                class="password-field w-full p-3 bg-background border border-text/20 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none text-text placeholder-gray-500 transition-all duration-300" 
+                                                placeholder="Repetir nueva contraseña" 
+                                                minlength="6" 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

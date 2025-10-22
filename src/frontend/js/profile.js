@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Configurar manejador del formulario único
     setupFormHandler();
+    
+    // Configurar botones de mostrar/ocultar contraseña
+    setupPasswordToggles();
+    
+    // Configurar validación en vivo de contraseña
+    setupPasswordValidation();
 });
 
 async function loadUserInfo() {
@@ -115,10 +121,11 @@ function validateFormData({ newUsername, newEmail, currentPassword, newPassword,
             };
         }
         
-        if (newPassword.length < 6) {
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.valid) {
             return {
                 isValid: false,
-                message: 'La nueva contraseña debe tener al menos 6 caracteres'
+                message: passwordValidation.message
             };
         }
         
@@ -207,4 +214,99 @@ function showMessage(text, type) {
             messageDiv.classList.add('hidden');
         }
     }, timeout);
+}
+
+// Validación de contraseña en vivo
+function validatePassword(password) {
+    const minLength = 6;
+    const hasUpper = /[A-ZÁÉÍÓÚÑ]/;
+    const hasLower = /[a-záéíóúñ]/;
+    const hasNumber = /\d/;
+
+    if (!password || password.trim() === '') {
+        return { valid: false, message: 'Mínimo 6 caracteres, al menos 1 mayúscula, 1 minúscula y 1 número.' };
+    }
+    if (password.length < minLength) {
+        return { valid: false, message: 'La contraseña debe tener al menos 6 caracteres' };
+    }
+    if (!hasUpper.test(password)) {
+        return { valid: false, message: 'Debe incluir al menos una letra mayúscula' };
+    }
+    if (!hasLower.test(password)) {
+        return { valid: false, message: 'Debe incluir al menos una letra minúscula' };
+    }
+    if (!hasNumber.test(password)) {
+        return { valid: false, message: 'Debe incluir al menos un número' };
+    }
+    return { valid: true, message: '' };
+}
+// Actualiza el estilo del campo de contraseña según su estado de validación
+function updatePasswordFieldStyle(inputId, state) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.remove('border-text/30', 'border-red-500', 'border-green-500');
+    input.classList.add('border');
+    if (state === true) {
+        input.classList.add('border-green-500');
+    } else if (state === false) {
+        input.classList.add('border-red-500');
+    } else {
+        input.classList.add('border-text/30');
+    }
+}
+
+function setupPasswordToggles() {
+    const toggleBtn = document.getElementById('toggleAllPasswords');
+    const iconShowAll = document.getElementById('iconShowAll');
+    const iconHideAll = document.getElementById('iconHideAll');
+    const passwordFields = document.querySelectorAll('.password-field');
+    const buttonText = toggleBtn.querySelector('span');
+    
+    if (toggleBtn && iconShowAll && iconHideAll && passwordFields.length > 0) {
+        toggleBtn.addEventListener('click', function() {
+            const allHidden = Array.from(passwordFields).every(field => field.type === 'password');
+            
+            // Cambiar el tipo de todos los campos
+            passwordFields.forEach(field => {
+                field.type = allHidden ? 'text' : 'password';
+            });
+            
+            // Cambiar los iconos y el texto
+            if (allHidden) {
+                iconShowAll.classList.add('hidden');
+                iconHideAll.classList.remove('hidden');
+                if (buttonText) buttonText.textContent = 'Ocultar contraseñas';
+            } else {
+                iconHideAll.classList.add('hidden');
+                iconShowAll.classList.remove('hidden');
+                if (buttonText) buttonText.textContent = 'Mostrar contraseñas';
+            }
+        });
+    }
+}
+
+function setupPasswordValidation() {
+    const passwordInput = document.getElementById('newPassword');
+    const passwordHelp = document.getElementById('passwordHelp');
+    
+    if (passwordInput && passwordHelp) {
+        passwordInput.addEventListener('input', function() {
+            const validation = validatePassword(passwordInput.value);
+            if (validation.valid) {
+                passwordHelp.textContent = 'Contraseña válida';
+                passwordHelp.className = 'block text-xs mt-1 text-green-500';
+                updatePasswordFieldStyle('newPassword', true);
+            } else {
+                passwordHelp.textContent = validation.message;
+                // Si está vacío, solo muestra el mensaje informativo sin color rojo
+                if (!passwordInput.value || passwordInput.value.trim() === '') {
+                    passwordHelp.className = 'block text-xs mt-1 text-gray-400';
+                    updatePasswordFieldStyle('newPassword', null);
+                } else {
+                    passwordHelp.className = 'block text-xs mt-1 text-red-500';
+                    updatePasswordFieldStyle('newPassword', false);
+                }
+            }
+        });
+    }
 }

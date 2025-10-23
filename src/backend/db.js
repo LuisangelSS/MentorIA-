@@ -305,13 +305,45 @@ export async function getProgressSummary(userId) {
         distribution[quiz.difficulty] = (distribution[quiz.difficulty] || 0) + 1;
     });
 
+    // Generar títulos descriptivos para los intentos recientes
+    const recentAttemptsWithTitles = (recentAttempts || []).map(attempt => {
+        const quiz = attempt.quizzes;
+        const title = generateQuizTitle(quiz.topic, quiz.difficulty);
+        return {
+            ...attempt,
+            title: title
+        };
+    });
+
     return {
         quizzes_count: quizzes?.length || 0,
         attempts_count: attempts?.length || 0,
         avg_score: Math.round(avg * 100) / 100,
-        recentAttempts: recentAttempts || [],
+        recentAttempts: recentAttemptsWithTitles,
         difficultyDistribution: Object.entries(distribution).map(([difficulty, count]) => ({ difficulty, count }))
     };
+}
+
+// ----------------------------
+// FUNCIONES AUXILIARES
+// ----------------------------
+
+// Generar título descriptivo para un quiz
+function generateQuizTitle(topic, difficulty) {
+    const difficultyMap = {
+        'basico': 'Básico',
+        'básico': 'Básico', 
+        'intermedio': 'Intermedio',
+        'avanzado': 'Avanzado',
+        'basic': 'Básico',
+        'intermediate': 'Intermedio',
+        'advanced': 'Avanzado'
+    };
+    
+    const normalizedDifficulty = difficultyMap[difficulty?.toLowerCase()] || 'Intermedio';
+    
+    // Crear título descriptivo basado en tema y dificultad
+    return `Quiz de ${topic} - ${normalizedDifficulty}`;
 }
 
 // ----------------------------

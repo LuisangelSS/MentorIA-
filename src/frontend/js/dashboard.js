@@ -22,20 +22,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Actualizar intentos recientes con gráficos
     const list = document.getElementById('recent-attempts');
-    list.innerHTML = (data.recentAttempts || []).map(a => `
-      <div class="bg-secondary p-4 rounded-lg relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent"></div>
-        <div class="relative z-10">
-          <div class="text-text font-bold text-xl mb-1">${escapeHtml(a.topic)}</div>
-          <div class="text-text/80 mb-2">Puntaje: ${a.score}/${a.total} (${Math.round((a.score/a.total)*100)}%)</div>
-          <div class="w-full bg-background-light rounded-full h-2 mb-2">
-            <div class="bg-gradient-to-r from-accent to-[#7b82d9] h-2 rounded-full transition-all duration-1000 ease-out" 
-                 style="width: ${(a.score/a.total)*100}%"></div>
+    list.innerHTML = (data.recentAttempts || []).map(a => {
+      const difficulty = a.quizzes?.difficulty?.toLowerCase() || 'intermedio';
+      const difficultyBadge = getDifficultyBadge(difficulty);
+      const quizTitle = a.quizzes?.topic || 'Quiz';
+      
+      return `
+        <div class="bg-secondary p-4 rounded-lg relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent"></div>
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-1">
+              <div class="text-text font-bold text-xl">${escapeHtml(quizTitle)}</div>
+              ${difficultyBadge}
+            </div>
+            <div class="text-text/80 mb-2">Puntaje: ${a.score}/${a.total} (${Math.round((a.score/a.total)*100)}%)</div>
+            <div class="w-full bg-background-light rounded-full h-2 mb-2">
+              <div class="bg-gradient-to-r from-accent to-[#7b82d9] h-2 rounded-full transition-all duration-1000 ease-out" 
+                   style="width: ${(a.score/a.total)*100}%"></div>
+            </div>
+            <div class="text-text/60 text-sm">${formatDate(a.completed_at)}</div>
           </div>
-          <div class="text-text/60 text-sm">${formatDate(a.completed_at)}</div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   } catch (err) {
     console.error(err);
   }
@@ -58,6 +67,27 @@ function formatDate(iso) {
   } catch {
     return iso;
   }
+}
+
+// Función para generar etiquetas de dificultad con colores
+function getDifficultyBadge(difficulty) {
+  const difficultyMap = {
+    'basico': { text: 'Básico', color: 'bg-green-500', textColor: 'text-white' },
+    'básico': { text: 'Básico', color: 'bg-green-500', textColor: 'text-white' },
+    'basic': { text: 'Básico', color: 'bg-green-500', textColor: 'text-white' },
+    'intermedio': { text: 'Intermedio', color: 'bg-yellow-500', textColor: 'text-white' },
+    'intermediate': { text: 'Intermedio', color: 'bg-yellow-500', textColor: 'text-white' },
+    'avanzado': { text: 'Avanzado', color: 'bg-red-500', textColor: 'text-white' },
+    'advanced': { text: 'Avanzado', color: 'bg-red-500', textColor: 'text-white' }
+  };
+  
+  const config = difficultyMap[difficulty] || { text: 'Intermedio', color: 'bg-yellow-500', textColor: 'text-white' };
+  
+  return `
+    <span class="px-2 py-1 rounded-full text-xs font-medium ${config.color} ${config.textColor}">
+      ${config.text}
+    </span>
+  `;
 }
 
 

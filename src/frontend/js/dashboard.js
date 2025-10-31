@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const difficultyBadge = getDifficultyBadge(difficulty);
       const quizTitle = a.quizzes?.topic || 'Quiz';
       
+      console.log('Intento de quiz:', a); // Debug
+      
       return `
         <div class="bg-secondary p-4 rounded-lg relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent"></div>
@@ -45,6 +47,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
     }).join('');
+    
+    // Si no hay intentos, mostrar mensaje
+    if (!data.recentAttempts || data.recentAttempts.length === 0) {
+      list.innerHTML = '<div class="col-span-full text-text/70 text-center py-8">Aún no has completado ningún quiz. ¡Comienza realizando tu primer quiz!</div>';
+    }
   } catch (err) {
     console.error(err);
   }
